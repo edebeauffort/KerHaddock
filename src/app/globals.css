@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-nunito);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-nunito), sans-serif;
+}
+
+/* Fully-booked calendar days (react-day-picker) — strikethrough on top of
+   the library's default greyed-out/disabled styling. */
+.rdp-day_unavailable {
+  text-decoration: line-through;
+}
+
+/* Booking calendars: force the 2 months side by side (never stacked), sized
+   down just enough that both still fit next to each other inside a house
+   card (falls back to a horizontal scroll on very narrow screens). */
+.hh-calendar {
+  --rdp-day-width: 36px;
+  --rdp-day-height: 36px;
+  --rdp-day_button-width: 34px;
+  --rdp-day_button-height: 34px;
+  --rdp-months-gap: 1rem;
+  --rdp-nav_button-width: 2rem;
+  --rdp-nav_button-height: 2rem;
+  --rdp-nav-height: 2.25rem;
+}
+
+.hh-calendar .rdp-months {
+  flex-wrap: nowrap;
+}
+
+.hh-calendar .rdp-month_caption {
+  font-size: 0.9375rem;
+}
+
+.hh-calendar .rdp-weekday {
+  font-size: 0.8125rem;
+}
