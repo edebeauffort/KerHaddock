@@ -5,9 +5,9 @@ import { login, requestPasswordReset } from "./actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; reset?: string }>;
+  searchParams: Promise<{ error?: string; reset?: string; resetError?: string }>;
 }) {
-  const { error, reset } = await searchParams;
+  const { error, reset, resetError } = await searchParams;
   const heroImages = getHeroImages();
 
   return (
@@ -76,6 +76,11 @@ export default async function LoginPage({
             required
             className="w-full rounded border border-slate-300 p-2 text-sm"
           />
+          {resetError && (
+            <p className="text-sm text-red-600">
+              Échec de l&apos;envoi : {resetError}
+            </p>
+          )}
           <button type="submit" className="text-sm text-slate-500 underline">
             Envoyer le lien de réinitialisation
           </button>

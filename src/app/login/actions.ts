@@ -39,9 +39,19 @@ export async function requestPasswordReset(formData: FormData) {
   // this just lets them set/reset their own password afterwards. The
   // redirectTo must also be added to Supabase's Redirect URLs allow list
   // (Authentication -> URL Configuration) or Supabase silently ignores it.
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/update-password`,
   });
+
+  if (error) {
+    // Surface it instead of always claiming success — the most common
+    // cause is Supabase's built-in mailer, which caps ALL auth emails
+    // (invite + reset + confirmation combined) at 2/hour and is meant for
+    // testing only. See the README's "Set up email" section for how to
+    // switch to a custom SMTP provider (Resend) and lift that limit.
+    console.error("resetPasswordForEmail failed:", error.message);
+    redirect(`/login?resetError=${encodeURIComponent(error.message)}`);
+  }
 
   redirect("/login?reset=1");
 }
