@@ -52,6 +52,7 @@ export async function createUser(
   }
 
   const admin = createAdminClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: {
       first_name: firstName,
@@ -59,6 +60,11 @@ export async function createUser(
       family_branch: familyBranch,
       role,
     },
+    // Without this, the invite email links back to Supabase's default Site
+    // URL instead of the page that lets the new user set a password. Must
+    // also be added to Supabase's Redirect URLs allow list (Authentication
+    // -> URL Configuration) or Supabase silently ignores it.
+    redirectTo: `${siteUrl}/auth/update-password`,
   });
 
   if (error) {

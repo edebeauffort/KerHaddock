@@ -1,3 +1,5 @@
+import HeroCarousel from "../HeroCarousel";
+import { getHeroImages } from "@/lib/heroImages";
 import { login, requestPasswordReset } from "./actions";
 
 export default async function LoginPage({
@@ -6,16 +8,27 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; reset?: string }>;
 }) {
   const { error, reset } = await searchParams;
+  const heroImages = getHeroImages();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-sm space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <div>
-          <h1 className="text-xl font-bold">L&apos;Île d&apos;Yeu</h1>
-          <p className="text-sm text-slate-500">
-            Connectez-vous avec le compte créé par un administrateur.
-          </p>
-        </div>
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center gap-10 p-4 text-center">
+      <HeroCarousel images={heroImages} />
+      <div className="absolute inset-0 bg-black/35" />
+
+      <div className="relative z-10">
+        <h1 className="text-4xl font-bold text-white drop-shadow-lg sm:text-5xl">
+          L&apos;Île d&apos;Yeu
+        </h1>
+        <p className="mt-3 text-lg text-white drop-shadow-lg">
+          Tout ce qu&apos;il faut savoir pour nos vacances, en un seul
+          endroit.
+        </p>
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm space-y-6 rounded-lg border border-slate-200 bg-white p-6 text-left shadow-xl">
+        <p className="text-sm text-slate-500">
+          Connectez-vous avec le compte créé par un administrateur.
+        </p>
 
         <form action={login} className="space-y-4">
           <div>

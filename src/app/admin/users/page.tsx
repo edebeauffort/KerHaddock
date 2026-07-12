@@ -25,15 +25,17 @@ export default async function AdminUsersPage() {
     );
   }
 
-  const { data: users } = await supabase
-    .from("profiles")
-    .select("id, first_name, last_name, email, family_branch, role")
-    .order("created_at");
-
-  const { data: priorityPeriods } = await supabase
-    .from("priority_periods")
-    .select("id, family_branch, year, date_range")
-    .order("year");
+  // Independent queries — fire together instead of waiting on each in turn.
+  const [{ data: users }, { data: priorityPeriods }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, first_name, last_name, email, family_branch, role")
+      .order("created_at"),
+    supabase
+      .from("priority_periods")
+      .select("id, family_branch, year, date_range")
+      .order("year"),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-10 p-6">

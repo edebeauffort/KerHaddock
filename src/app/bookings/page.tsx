@@ -136,45 +136,45 @@ export default async function BookingsPage() {
     data: { user: currentUser },
   } = await supabase.auth.getUser();
 
-  const { data: houses } = await supabase
-    .from("houses")
-    .select("id, name")
-    .order("created_at");
-
-  const { data: rooms } = await supabase
-    .from("rooms")
-    .select("id, name, capacity, house_id")
-    .order("name");
-
-  const { data: bookings } = await supabase
-    .from("bookings")
-    .select("id, room_id, user_id, date_range, guest_count, notes, created_at, status, pending_branches")
-    .eq("status", "confirmed")
-    .order("date_range");
-
-  const { data: pendingRows } = await supabase
-    .from("bookings")
-    .select("id, room_id, user_id, date_range, guest_count, notes, created_at, status, pending_branches")
-    .eq("status", "pending")
-    .order("date_range");
-
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, first_name, last_name");
-
-  const { data: myProfile } = await supabase
-    .from("profiles")
-    .select("family_branch")
-    .eq("id", currentUser?.id ?? "")
-    .single();
-
+  // None of these queries depend on each other, so fire them all at once
+  // instead of waiting on each round-trip in turn — on a real network (as
+  // opposed to localhost), doing this sequentially can easily add a second
+  // or more to the page load.
   const currentYear = new Date().getFullYear();
-  const { data: priorityPeriods } = await supabase
-    .from("priority_periods")
-    .select("family_branch, year, date_range")
-    .gte("year", currentYear)
-    .order("year")
-    .order("family_branch");
+  const [
+    { data: houses },
+    { data: rooms },
+    { data: bookings },
+    { data: pendingRows },
+    { data: profiles },
+    { data: myProfile },
+    { data: priorityPeriods },
+  ] = await Promise.all([
+    supabase.from("houses").select("id, name").order("created_at"),
+    supabase.from("rooms").select("id, name, capacity, house_id").order("name"),
+    supabase
+      .from("bookings")
+      .select("id, room_id, user_id, date_range, guest_count, notes, created_at, status, pending_branches")
+      .eq("status", "confirmed")
+      .order("date_range"),
+    supabase
+      .from("bookings")
+      .select("id, room_id, user_id, date_range, guest_count, notes, created_at, status, pending_branches")
+      .eq("status", "pending")
+      .order("date_range"),
+    supabase.from("profiles").select("id, first_name, last_name"),
+    supabase
+      .from("profiles")
+      .select("family_branch")
+      .eq("id", currentUser?.id ?? "")
+      .single(),
+    supabase
+      .from("priority_periods")
+      .select("family_branch, year, date_range")
+      .gte("year", currentYear)
+      .order("year")
+      .order("family_branch"),
+  ]);
 
   const groupedBookings = groupBookings(
     bookings ?? [],

@@ -59,6 +59,12 @@ family. Once you're logged in as a host, use the **Utilisateurs** page in the
 nav to invite people directly (sends them an email invite, and lets you set
 their name, family branch, and role — `host` or `guest` — right away).
 
+The invite email (and the "mot de passe oublié" email from the login page)
+links to `/auth/update-password`, where the person picks their own password
+— **this only works once you've added that URL to Supabase's Redirect URLs
+allow list**, see step 5 under Deploy below (and, for testing locally,
+`http://localhost:3000/auth/update-password` too).
+
 `e.debeauffort@gmail.com` is set as the first host automatically by the
 migrations. Hosts can create, edit, and delete any account from Utilisateurs;
 guests can only edit their own name/branch from the Compte page.
@@ -92,18 +98,40 @@ Visit `http://localhost:3000` — you'll be redirected to `/login`.
 
 1. Push this project to a GitHub repo (private is fine).
 2. [vercel.com/new](https://vercel.com/new) → import the repo.
-3. Add the two environment variables from `.env.local` in the Vercel project
-   settings (Environment Variables).
+3. In the Vercel project's **Settings → Environment Variables**, add every
+   variable from your local `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SITE_URL` — set this to your real Vercel URL (e.g.
+     `https://holiday-house.vercel.app`, no trailing slash). It's used to
+     build the link inside invite and password-reset emails.
+   - `SUPABASE_SERVICE_ROLE_KEY` (mark it sensitive — Vercel will still make
+     it available server-side, just hides the value in the dashboard)
+   - `RESEND_API_KEY` (skip this one only if you don't want approval emails)
+   - `RESEND_FROM_EMAIL` (optional — omit to use Resend's shared sender)
 4. Deploy. Vercel's free tier is plenty for a family site.
+5. Back in Supabase, open **Authentication → URL Configuration**:
+   - Set the **Site URL** to your new Vercel URL (e.g.
+     `https://holiday-house.vercel.app`).
+   - Under **Redirect URLs**, add
+     `https://holiday-house.vercel.app/auth/update-password` (swap in your
+     real domain). This is the page that lets a newly-invited family member
+     set their password, and that a "forgot password" email links to —
+     without this entry Supabase silently ignores the link and falls back
+     to the Site URL instead, landing people on a plain login screen with
+     no way to set a password.
+   - If you deploy to a different Vercel URL later (or add a custom
+     domain), update both of these and the `NEXT_PUBLIC_SITE_URL` env var
+     to match, or invite/reset links will point to the wrong place.
 
 ## What's implemented vs. stubbed
 
 | Feature | Status |
 |---|---|
-| Login (invite-only, Supabase Auth) | ✅ working |
+| Login (invite-only, Supabase Auth) | ✅ working — invite and "forgot password" emails link to `/auth/update-password` to set a password |
 | Booking: one shared calendar + guest count, then pick any combination of whole houses / independent bedrooms as large photo buttons | ✅ working — see `supabase/schema.sql` for the overlap-prevention constraint. If your Supabase project already had the old (house-less) schema, run `supabase/migrations/0002_add_houses.sql` instead of the full `schema.sql`. |
 | Weather (Windy embed + Open-Meteo + Meteoconsult link) | ✅ working |
-| Webcam | 🚧 stub — needs a manual check of whether vendee.fr/viewsurf.com offer an official embed code before wiring up, see `/webcam` page for notes |
+| Webcam | ✅ working — ViewSurf embed of the Port de l'Île d'Yeu camera |
 | Photo gallery | 🚧 stub — Phase 3 in the build plan |
 | Tips & tricks | 🚧 stub — Phase 4 |
 | Restaurants + map | 🚧 stub — Phase 4 |
