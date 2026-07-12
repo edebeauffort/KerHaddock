@@ -52,6 +52,69 @@ period granted") are sent via [Resend](https://resend.com):
    sending the email (logged to the server console) instead of failing the
    booking or approval.
 
+## 2.6 Raise the auth-email limit (custom SMTP)
+
+By default, Supabase sends invite, password-reset, and confirmation emails
+through its **own built-in mailer, capped at 2 emails per hour total across
+all of those types** — fine for a first local test, but you'll hit it
+almost immediately once real invites and resets start going out, and
+Supabase just silently drops anything past the limit (no error the app can
+show you).
+
+Fix it by pointing Supabase at your own Resend account instead (the one you
+already set up in step 2.5):
+
+1. In the Supabase dashboard, open **Authentication → Emails → SMTP
+   Settings** (also reachable from **Project Settings → Authentication**)
+   and enable **Custom SMTP**.
+2. Fill in:
+   - **Host:** `smtp.resend.com`
+   - **Port:** `465`
+   - **Username:** `resend` (the literal word, not your email)
+   - **Password:** your `RESEND_API_KEY`
+   - **Sender email:** the same address you set as `RESEND_FROM_EMAIL` (must
+     be on a domain verified in Resend — the shared `onboarding@resend.dev`
+     address won't work here since Supabase needs to send *from* it)
+   - **Sender name:** whatever you'd like family members to see, e.g. "The
+     Holiday House"
+3. Save. Supabase applies a default limit of 30 emails/hour on custom SMTP
+   (adjustable in **Authentication → Rate Limits**) — plenty for a family.
+
+If you skip this step, invites and password resets will work the first
+couple of times, then start silently failing once the built-in mailer's
+2/hour cap is hit — which is exactly what an empty inbox with no error
+usually means.
+
+## 2.7 Point invite/reset emails at the password-setup page (required)
+
+Out of the box, Supabase's invite and password-reset emails link to its own
+hosted confirmation endpoint, which then redirects back to your app — a
+redirect that only works if it exactly matches an entry in Supabase's
+Redirect URLs allow list, and is a common source of the link "working" but
+landing back on the plain login screen instead of a password form.
+
+This project avoids that by verifying the link itself, server-side, at
+`/auth/confirm`. To wire it up, edit two templates in the Supabase
+dashboard under **Authentication → Email Templates**:
+
+**Invite user** — replace the button/link's `href` (it currently points to
+`{{ .ConfirmationURL }}`) with:
+
+```
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/auth/update-password
+```
+
+**Reset password** — same thing, with `type=recovery`:
+
+```
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/auth/update-password
+```
+
+You can restyle the rest of the template freely (subject line, wording,
+branding) — just make sure that link/button href is exactly the string
+above in each template. With this in place, there's no Redirect URLs entry
+to add — `{{ .SiteURL }}` (the Site URL you set in step 5) is all it needs.
+
 ## 3. Invite the family (no public sign-up, on purpose)
 
 This app has no self-serve registration — it's meant to stay closed to your
@@ -60,10 +123,12 @@ nav to invite people directly (sends them an email invite, and lets you set
 their name, family branch, and role — `host` or `guest` — right away).
 
 The invite email (and the "mot de passe oublié" email from the login page)
-links to `/auth/update-password`, where the person picks their own password
-— **this only works once you've added that URL to Supabase's Redirect URLs
-allow list**, see step 5 under Deploy below (and, for testing locally,
-`http://localhost:3000/auth/update-password` too).
+links to `/auth/update-password`, where the person picks their own
+password. This depends on two things set up earlier: the custom SMTP setup
+from step 2.6 (without it you'll get 2 working invites total before emails
+start silently failing) and the email templates from step 2.7 (without
+that, the link lands back on the plain login screen instead of a password
+form).
 
 `e.debeauffort@gmail.com` is set as the first host automatically by the
 migrations. Hosts can create, edit, and delete any account from Utilisateurs;
@@ -110,19 +175,13 @@ Visit `http://localhost:3000` — you'll be redirected to `/login`.
    - `RESEND_API_KEY` (skip this one only if you don't want approval emails)
    - `RESEND_FROM_EMAIL` (optional — omit to use Resend's shared sender)
 4. Deploy. Vercel's free tier is plenty for a family site.
-5. Back in Supabase, open **Authentication → URL Configuration**:
-   - Set the **Site URL** to your new Vercel URL (e.g.
-     `https://holiday-house.vercel.app`).
-   - Under **Redirect URLs**, add
-     `https://holiday-house.vercel.app/auth/update-password` (swap in your
-     real domain). This is the page that lets a newly-invited family member
-     set their password, and that a "forgot password" email links to —
-     without this entry Supabase silently ignores the link and falls back
-     to the Site URL instead, landing people on a plain login screen with
-     no way to set a password.
+5. Back in Supabase, open **Authentication → URL Configuration** and set
+   the **Site URL** to your new Vercel URL (e.g.
+   `https://holiday-house.vercel.app`). The invite/reset email templates
+   from step 2.7 use this (`{{ .SiteURL }}`) to build their link back to
+   your app.
    - If you deploy to a different Vercel URL later (or add a custom
-     domain), update both of these and the `NEXT_PUBLIC_SITE_URL` env var
-     to match, or invite/reset links will point to the wrong place.
+     domain), update this and the `NEXT_PUBLIC_SITE_URL` env var to match.
 
 ## What's implemented vs. stubbed
 

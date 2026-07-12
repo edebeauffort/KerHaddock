@@ -36,9 +36,11 @@ export async function requestPasswordReset(formData: FormData) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   // Family members are invited by an admin from the Supabase dashboard;
-  // this just lets them set/reset their own password afterwards. The
-  // redirectTo must also be added to Supabase's Redirect URLs allow list
-  // (Authentication -> URL Configuration) or Supabase silently ignores it.
+  // this just lets them set/reset their own password afterwards. redirectTo
+  // here is a fallback only used if the Supabase email template still uses
+  // the default {{ .ConfirmationURL }} — once the "Reset password" template
+  // is customized per README 2.7 (recommended), the link goes through
+  // /auth/confirm instead and this value is ignored.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/update-password`,
   });

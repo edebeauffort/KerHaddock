@@ -60,10 +60,10 @@ export async function createUser(
       family_branch: familyBranch,
       role,
     },
-    // Without this, the invite email links back to Supabase's default Site
-    // URL instead of the page that lets the new user set a password. Must
-    // also be added to Supabase's Redirect URLs allow list (Authentication
-    // -> URL Configuration) or Supabase silently ignores it.
+    // Fallback only used if the "Invite user" template in Supabase still
+    // uses the default {{ .ConfirmationURL }} — once that template is
+    // customized per README 2.7 (recommended), the link goes through
+    // /auth/confirm instead and this value is ignored.
     redirectTo: `${siteUrl}/auth/update-password`,
   });
 
