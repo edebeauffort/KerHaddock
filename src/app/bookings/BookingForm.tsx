@@ -539,8 +539,8 @@ function OptionButton({
         </div>
       )}
       <div className="absolute inset-x-0 bottom-0 p-2 text-white">
-        <p className="text-sm font-semibold drop-shadow">{label}</p>
-        <p className="text-xs opacity-90 drop-shadow">{sublabel}</p>
+        <p className="text-lg font-bold leading-tight drop-shadow">{label}</p>
+        <p className="text-sm opacity-90 drop-shadow">{sublabel}</p>
       </div>
     </button>
   );

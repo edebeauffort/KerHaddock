@@ -1,7 +1,10 @@
 import Link from "next/link";
 import HeroCarousel from "./HeroCarousel";
 import { getHeroImages } from "@/lib/heroImages";
+import { createClient } from "@/lib/supabase/server";
 
+// Available features first, not-yet-available ones after — same order
+// used in the header nav.
 const CARDS = [
   {
     href: "/bookings",
@@ -13,6 +16,12 @@ const CARDS = [
     href: "/weather",
     title: "Météo",
     description: "Vent, vagues et prévisions pour la maison.",
+    ready: true,
+  },
+  {
+    href: "/webcam",
+    title: "Webcam",
+    description: "Vue en direct près de la maison.",
     ready: true,
   },
   {
@@ -33,16 +42,25 @@ const CARDS = [
     description: "Nos adresses préférées sur une carte.",
     ready: false,
   },
-  {
-    href: "/webcam",
-    title: "Webcam",
-    description: "Vue en direct près de la maison.",
-    ready: true,
-  },
 ];
 
-export default function Home() {
+export default async function Home() {
   const heroImages = getHeroImages();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let firstName: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("first_name")
+      .eq("id", user.id)
+      .single();
+    firstName = profile?.first_name ?? null;
+  }
 
   return (
     // Photo(s) cover the whole section (however tall it needs to be);
@@ -57,7 +75,7 @@ export default function Home() {
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16 text-center text-white">
         <div>
           <h1 className="text-4xl font-bold drop-shadow-lg sm:text-5xl">
-            L&apos;Île d&apos;Yeu
+            Bienvenue à L&apos;Île d&apos;Yeu{firstName ? `, ${firstName}` : ""}
           </h1>
           <p className="mt-3 text-lg drop-shadow-lg">
             Tout ce qu&apos;il faut savoir pour nos vacances, en un seul
@@ -66,23 +84,44 @@ export default function Home() {
         </div>
 
         <div className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2">
-          {CARDS.map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="rounded-2xl border border-white/30 bg-white/10 p-4 text-left text-white shadow-lg backdrop-blur-xl transition hover:border-brand-mint hover:bg-brand-mint/40"
-            >
-              <div className="mb-1 flex items-center justify-between">
-                <h2 className="font-semibold">{card.title}</h2>
-                {!card.ready && (
-                  <span className="rounded-full border border-white/30 bg-white/10 px-2 py-0.5 text-xs text-white/90">
-                    bientôt disponible
-                  </span>
-                )}
-              </div>
-              <p className="text-sm text-white/80">{card.description}</p>
-            </Link>
-          ))}
+          {CARDS.map((card) => {
+            const content = (
+              <>
+                <div className="mb-1 flex items-center justify-between">
+                  <h2 className="font-semibold">{card.title}</h2>
+                  {!card.ready && (
+                    <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs text-white/70">
+                      bientôt disponible
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-white/80">{card.description}</p>
+              </>
+            );
+
+            // Not-ready features aren't clickable — a plain (dimmer) div
+            // instead of a Link, so there's nowhere to navigate to yet.
+            if (!card.ready) {
+              return (
+                <div
+                  key={card.href}
+                  className="cursor-default rounded-2xl border border-white/20 bg-white/5 p-4 text-left text-white/70 shadow-lg backdrop-blur-xl"
+                >
+                  {content}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="rounded-2xl border border-white/30 bg-white/10 p-4 text-left text-white shadow-lg backdrop-blur-xl transition hover:border-brand-mint hover:bg-brand-mint/40"
+              >
+                {content}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

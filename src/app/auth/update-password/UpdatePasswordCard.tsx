@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/authErrors";
 
 export default function UpdatePasswordCard() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export default function UpdatePasswordCard() {
     setSubmitting(false);
 
     if (updateError) {
-      setError(updateError.message);
+      setError(translateAuthError(updateError.message));
       return;
     }
 

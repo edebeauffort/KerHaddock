@@ -16,13 +16,15 @@ export const metadata: Metadata = {
     "Tout ce qu'il faut savoir pour nos vacances, en un seul endroit.",
 };
 
+// Available features first (left), not-yet-available ones after (right) —
+// same order used on the homepage cards.
 const NAV_LINKS = [
-  { href: "/bookings", label: "Réservations" },
-  { href: "/gallery", label: "Galerie" },
-  { href: "/tips", label: "Astuces" },
-  { href: "/restaurants", label: "Restaurants" },
-  { href: "/weather", label: "Météo" },
-  { href: "/webcam", label: "Webcam" },
+  { href: "/bookings", label: "Réservations", ready: true },
+  { href: "/weather", label: "Météo", ready: true },
+  { href: "/webcam", label: "Webcam", ready: true },
+  { href: "/gallery", label: "Galerie", ready: false },
+  { href: "/tips", label: "Astuces", ready: false },
+  { href: "/restaurants", label: "Restaurants", ready: false },
 ];
 
 export default async function RootLayout({

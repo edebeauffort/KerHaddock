@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { translateAuthError } from "@/lib/authErrors";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -16,7 +17,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect(`/login?error=${encodeURIComponent(translateAuthError(error.message))}`);
   }
 
   revalidatePath("/", "layout");
@@ -52,7 +53,7 @@ export async function requestPasswordReset(formData: FormData) {
     // testing only. See the README's "Set up email" section for how to
     // switch to a custom SMTP provider (Resend) and lift that limit.
     console.error("resetPasswordForEmail failed:", error.message);
-    redirect(`/login?resetError=${encodeURIComponent(error.message)}`);
+    redirect(`/login?resetError=${encodeURIComponent(translateAuthError(error.message))}`);
   }
 
   redirect("/login?reset=1");

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type NavLink = { href: string; label: string };
+type NavLink = { href: string; label: string; ready?: boolean };
 
 function HamburgerIcon() {
   return (
@@ -95,15 +95,24 @@ export default function SiteHeader({
             isHome ? "text-white drop-shadow" : "text-slate-900"
           }`}
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-3 py-1.5 transition hover:bg-brand-mint hover:text-slate-900"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) =>
+            link.ready === false ? (
+              <span
+                key={link.href}
+                className="cursor-default rounded-full px-3 py-1.5 opacity-50"
+              >
+                {link.label}
+              </span>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-full px-3 py-1.5 transition hover:bg-brand-mint hover:text-slate-900"
+              >
+                {link.label}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -176,13 +185,19 @@ export default function SiteHeader({
           <ul className="flex flex-col gap-1 pt-2 text-sm font-medium">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-full px-3 py-2 transition hover:bg-brand-mint"
-                >
-                  {link.label}
-                </Link>
+                {link.ready === false ? (
+                  <span className="block cursor-default rounded-full px-3 py-2 opacity-50">
+                    {link.label}
+                  </span>
+                ) : (
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block rounded-full px-3 py-2 transition hover:bg-brand-mint"
+                  >
+                    {link.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
