@@ -194,7 +194,7 @@ export default function EditStayForm({
         <p className="text-xs text-green-600">Mis à jour — fermeture…</p>
       )}
       {state.success && state.pending && (
-        <p className="text-xs text-amber-600">
+        <p className="text-xs font-medium text-slate-700">
           Ces dates tombent dans la période prioritaire d&apos;une autre branche —
           demande envoyée pour approbation. Fermeture…
         </p>
@@ -204,7 +204,7 @@ export default function EditStayForm({
         <button
           type="submit"
           disabled={pending || selectedRoomIds.length === 0}
-          className="rounded bg-slate-900 px-3 py-1.5 text-xs text-white disabled:opacity-50"
+          className="rounded bg-brand-teal px-3 py-1.5 text-xs text-white hover:bg-brand-teal-dark disabled:opacity-50"
         >
           {pending ? "Enregistrement…" : "Enregistrer"}
         </button>

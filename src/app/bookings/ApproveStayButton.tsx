@@ -24,7 +24,7 @@ export default function ApproveStayButton({
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-amber-600 px-3 py-1.5 text-xs text-white disabled:opacity-50"
+        className="rounded bg-brand-teal px-3 py-1.5 text-xs text-white hover:bg-brand-teal-dark disabled:opacity-50"
       >
         {pending ? "Approbation…" : "Approuver"}
       </button>

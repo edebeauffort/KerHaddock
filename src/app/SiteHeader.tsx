@@ -96,7 +96,11 @@ export default function SiteHeader({
           }`}
         >
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:underline">
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full px-3 py-1.5 transition hover:bg-brand-mint hover:text-slate-900"
+            >
               {link.label}
             </Link>
           ))}
@@ -111,7 +115,7 @@ export default function SiteHeader({
               className={
                 isHome
                   ? "flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/20 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30"
-                  : "flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                  : "flex h-9 w-9 items-center justify-center rounded-full border border-brand-teal bg-brand-teal text-sm font-semibold text-white hover:bg-brand-teal-dark"
               }
               aria-label="Compte"
             >
@@ -175,7 +179,7 @@ export default function SiteHeader({
                 <Link
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block rounded px-2 py-2 hover:bg-slate-50"
+                  className="block rounded-full px-3 py-2 transition hover:bg-brand-mint"
                 >
                   {link.label}
                 </Link>

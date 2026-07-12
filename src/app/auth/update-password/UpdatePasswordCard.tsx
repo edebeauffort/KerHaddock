@@ -95,7 +95,7 @@ export default function UpdatePasswordCard() {
           </p>
           <a
             href="/login"
-            className="block w-full rounded bg-slate-900 px-4 py-2 text-center text-white"
+            className="block w-full rounded bg-brand-teal px-4 py-2 text-center text-white hover:bg-brand-teal-dark"
           >
             Retour à la connexion
           </a>
@@ -140,7 +140,7 @@ export default function UpdatePasswordCard() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+              className="w-full rounded bg-brand-teal px-4 py-2 text-white hover:bg-brand-teal-dark disabled:opacity-50"
             >
               {submitting ? "Enregistrement…" : "Valider"}
             </button>

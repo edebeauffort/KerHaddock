@@ -11,6 +11,16 @@
   --font-sans: var(--font-nunito);
 }
 
+/* Brand palette — soft coastal greens/cream, used for primary actions,
+   selection states, and "pending" notices across the site and emails. */
+@theme {
+  --color-brand-cream: #f5f0bb;
+  --color-brand-mint: #c4dfaa;
+  --color-brand-sage: #90c8ac;
+  --color-brand-teal: #73a9ad;
+  --color-brand-teal-dark: #5b8c90;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -42,6 +52,10 @@ body {
   --rdp-nav_button-width: 2rem;
   --rdp-nav_button-height: 2rem;
   --rdp-nav-height: 2.25rem;
+
+  /* Swap the library's default blue selection color for the brand palette. */
+  --rdp-accent-color: #73a9ad;
+  --rdp-accent-background-color: #c4dfaa;
 }
 
 .hh-calendar .rdp-months {

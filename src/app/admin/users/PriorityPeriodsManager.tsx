@@ -69,7 +69,7 @@ function BranchRow({ branch, period, year }: { branch: string; period?: Period; 
           <button
             type="submit"
             disabled={pending}
-            className="rounded bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50"
+            className="rounded bg-brand-teal px-3 py-2 text-sm text-white hover:bg-brand-teal-dark disabled:opacity-50"
           >
             {pending ? "Enregistrement…" : range ? "Mettre à jour" : "Définir"}
           </button>

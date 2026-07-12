@@ -48,7 +48,7 @@ export default function StayListItem({
   return (
     <li
       className={`rounded border p-3 text-sm ${
-        isPending ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-white"
+        isPending ? "border-brand-sage bg-brand-cream" : "border-slate-200 bg-white"
       }`}
     >
       <span className="font-medium">
@@ -62,7 +62,7 @@ export default function StayListItem({
       </p>
 
       {isPending && (
-        <p className="mt-1 text-amber-700">
+        <p className="mt-1 text-slate-700">
           En attente d&apos;approbation de {pendingBranches!.join(", ")}
         </p>
       )}

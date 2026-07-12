@@ -91,7 +91,7 @@ export default function CreateUserForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+        className="rounded bg-brand-teal px-4 py-2 text-white hover:bg-brand-teal-dark disabled:opacity-50"
       >
         {pending ? "Envoi…" : "Envoyer l'invitation"}
       </button>

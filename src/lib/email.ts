@@ -13,7 +13,13 @@ function getClient() {
 }
 
 async function sendEmail(to: string[], subject: string, html: string) {
-  if (to.length === 0) return;
+  if (to.length === 0) {
+    // Most often this means no one in the target family branch has an
+    // email on file yet — worth knowing about, but shouldn't block the
+    // booking/approval action that triggered the send.
+    console.warn("No recipients — skipping email:", subject);
+    return;
+  }
 
   const resend = getClient();
   if (!resend) {
@@ -24,8 +30,24 @@ async function sendEmail(to: string[], subject: string, html: string) {
     return;
   }
 
+  if (FROM_EMAIL === "onboarding@resend.dev") {
+    // Resend's shared sandbox sender only delivers to the email address
+    // you signed up to Resend with — every other recipient is silently
+    // rejected. This is almost always why "it worked when I tested it
+    // myself but no one else got the email." See README 2.5.
+    console.warn(
+      "RESEND_FROM_EMAIL not set (using the shared onboarding@resend.dev sender) — delivery to anyone other than your own Resend account email will fail:",
+      subject,
+    );
+  }
+
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
+    const { error } = await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
+    if (error) {
+      // The SDK resolves with an `error` field on API-level rejections
+      // (e.g. the sandbox-sender restriction above) rather than throwing.
+      console.error("Resend rejected the email:", subject, error);
+    }
   } catch (err) {
     // Same reasoning: a broken email send shouldn't break the booking or
     // approval action that triggered it.

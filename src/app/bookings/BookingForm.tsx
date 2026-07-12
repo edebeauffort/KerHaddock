@@ -352,7 +352,7 @@ export default function BookingForm({
           )}
 
           {overlappingBranches.length > 0 && (
-            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+            <div className="rounded-md border border-brand-sage bg-brand-cream p-3 text-sm text-slate-800">
               Attention : ces dates tombent pendant la période prioritaire de
               la famille {overlappingBranches.join(", ")}. Votre réservation
               nécessitera l&apos;approbation d&apos;un membre de cette famille
@@ -367,7 +367,7 @@ export default function BookingForm({
           <button
             type="button"
             onClick={() => setShowAvailability(true)}
-            className="rounded-full bg-slate-900 px-8 py-3 text-base font-semibold text-white hover:bg-slate-800"
+            className="rounded-full bg-brand-teal px-8 py-3 text-base font-semibold text-white hover:bg-brand-teal-dark"
           >
             Voir les disponibilités
           </button>
@@ -466,7 +466,7 @@ export default function BookingForm({
               <p className="text-sm text-green-600">Réservation confirmée.</p>
             )}
             {state.success && state.pending && (
-              <p className="text-sm text-amber-600">
+              <p className="text-sm font-medium text-slate-700">
                 Ces dates tombent pendant la période prioritaire d&apos;une
                 autre branche familiale. Votre demande a été envoyée pour
                 approbation.
@@ -476,7 +476,7 @@ export default function BookingForm({
             <button
               type="submit"
               disabled={pending || finalRoomIds.length === 0}
-              className="rounded bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand-teal px-4 py-2 text-white hover:bg-brand-teal-dark disabled:opacity-50"
             >
               {pending ? "Réservation…" : "Réserver"}
             </button>
@@ -511,7 +511,7 @@ function OptionButton({
       onClick={onClick}
       className={`group relative aspect-square overflow-hidden rounded-lg border-2 text-left transition ${
         selected
-          ? "border-slate-900 ring-2 ring-slate-900"
+          ? "border-brand-teal ring-2 ring-brand-teal"
           : "border-slate-200"
       } ${!available ? "cursor-not-allowed opacity-50" : "hover:border-slate-400"}`}
       style={
@@ -534,7 +534,7 @@ function OptionButton({
         </div>
       )}
       {selected && (
-        <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+        <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-teal text-xs font-bold text-white">
           ✓
         </div>
       )}

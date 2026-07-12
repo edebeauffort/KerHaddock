@@ -70,7 +70,7 @@ export default function Home() {
             <Link
               key={card.href}
               href={card.href}
-              className="rounded-2xl border border-white/30 bg-white/10 p-4 text-left text-white shadow-lg backdrop-blur-xl transition hover:border-white/50 hover:bg-white/20"
+              className="rounded-2xl border border-white/30 bg-white/10 p-4 text-left text-white shadow-lg backdrop-blur-xl transition hover:border-brand-mint hover:bg-brand-mint/40"
             >
               <div className="mb-1 flex items-center justify-between">
                 <h2 className="font-semibold">{card.title}</h2>

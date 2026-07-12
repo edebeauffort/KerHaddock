@@ -59,7 +59,7 @@ export default async function LoginPage({
 
           <button
             type="submit"
-            className="w-full rounded bg-slate-900 px-4 py-2 text-white"
+            className="w-full rounded bg-brand-teal px-4 py-2 text-white hover:bg-brand-teal-dark"
           >
             Se connecter
           </button>

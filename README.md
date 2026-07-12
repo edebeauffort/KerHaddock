@@ -43,14 +43,19 @@ period granted") are sent via [Resend](https://resend.com):
 
 1. Create a free Resend account and grab an API key from the dashboard.
 2. Add it to `.env.local` as `RESEND_API_KEY`.
-3. By default, emails send from Resend's shared `onboarding@resend.dev`
-   address, which **only delivers to the email you signed up to Resend
-   with** — fine for testing alone, not for the whole family. For real
-   delivery to everyone, verify your own domain in Resend and set
-   `RESEND_FROM_EMAIL` in `.env.local` to an address on it.
-4. If `RESEND_API_KEY` isn't set, the app still works — it just skips
-   sending the email (logged to the server console) instead of failing the
-   booking or approval.
+3. **Verify your own domain in Resend and set `RESEND_FROM_EMAIL`** in
+   `.env.local` to an address on it — this step is not optional in
+   practice. Until it's done, emails send from Resend's shared
+   `onboarding@resend.dev` address, which **only delivers to the email
+   address you personally signed up to Resend with**; every other
+   recipient is silently rejected. Since approval emails are addressed to
+   *other* family members by design, skipping this step means those emails
+   will never arrive — it'll look like the feature is broken when it's
+   really just unconfigured. (You'll see this logged as a warning in the
+   server console/Vercel function logs either way.)
+4. If `RESEND_API_KEY` isn't set at all, the app still works — it just
+   skips sending the email (logged to the server console) instead of
+   failing the booking or approval.
 
 ## 2.6 Raise the auth-email limit (custom SMTP)
 
@@ -94,26 +99,25 @@ Redirect URLs allow list, and is a common source of the link "working" but
 landing back on the plain login screen instead of a password form.
 
 This project avoids that by verifying the link itself, server-side, at
-`/auth/confirm`. To wire it up, edit two templates in the Supabase
-dashboard under **Authentication → Email Templates**:
+`/auth/confirm`. Two ready-made, Airbnb-style HTML templates that link
+there correctly are included at `supabase/email-templates/invite.html` and
+`supabase/email-templates/reset-password.html` — open each, copy the whole
+file, and paste it into the matching template's HTML box in the Supabase
+dashboard under **Authentication → Email Templates** (it replaces
+everything in that box, subject line is a separate field above it —
+suggested subjects: "Vous êtes invité·e à rejoindre L'Île d'Yeu" and
+"Réinitialisez votre mot de passe – L'Île d'Yeu").
 
-**Invite user** — replace the button/link's `href` (it currently points to
-`{{ .ConfirmationURL }}`) with:
+If you'd rather adapt your own template instead, the one required part is
+the link/button `href`:
 
 ```
-{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/auth/update-password
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite&amp;next=/auth/update-password
 ```
 
-**Reset password** — same thing, with `type=recovery`:
-
-```
-{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/auth/update-password
-```
-
-You can restyle the rest of the template freely (subject line, wording,
-branding) — just make sure that link/button href is exactly the string
-above in each template. With this in place, there's no Redirect URLs entry
-to add — `{{ .SiteURL }}` (the Site URL you set in step 5) is all it needs.
+(swap `type=invite` for `type=recovery` on the Reset password template).
+With this in place, there's no Redirect URLs entry to add — `{{ .SiteURL }}`
+(the Site URL you set in step 5) is all it needs.
 
 ## 3. Invite the family (no public sign-up, on purpose)
 
