@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { branchColor, branchInitial } from "@/lib/branchColors";
+
 type Period = {
   family_branch: string;
   year: number;
@@ -11,59 +14,111 @@ function parseRange(range: string) {
   return { start: match[1], end: match[2] };
 }
 
-function formatFr(dateStr: string) {
+function formatShortFr(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00`);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
-// Server component — just formats and lists whatever priority_periods rows
-// it's given, grouped by year.
-export default function BookingRulesIntro({ periods }: { periods: Period[] }) {
-  const years = Array.from(new Set(periods.map((p) => p.year))).sort();
+// Server component — shows the intro blurb, a year switcher, and one card
+// per family branch with that year's priority period (in chronological
+// order within the season, labelled "Période 1, 2, 3…").
+export default function BookingRulesIntro({
+  periods,
+  year,
+}: {
+  periods: Period[];
+  year: number;
+}) {
+  const periodsThisYear = periods
+    .filter((p) => p.year === year)
+    .map((p) => ({ ...p, range: parseRange(p.date_range) }))
+    .filter((p): p is Period & { range: { start: string; end: string } } =>
+      Boolean(p.range),
+    )
+    .sort((a, b) => a.range.start.localeCompare(b.range.start));
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-      <h2 className="mb-1 text-base font-semibold text-slate-900">
-        Comment fonctionne la réservation
-      </h2>
-      <p>
-        Chaque branche familiale a une quinzaine prioritaire en juillet-août,
-        différente chaque année. Vous pouvez réserver n&apos;importe quelle date
-        libre ci-dessous — mais si vos dates tombent pendant la période
-        prioritaire d&apos;une autre branche, votre demande sera mise en
-        attente jusqu&apos;à ce qu&apos;un membre de cette famille l&apos;approuve
-        (vous recevrez un email dès que ce sera fait).
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">Saison {year}</h2>
+          <p className="text-sm text-slate-500">
+            Priorités en vigueur pour juillet et août
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/bookings?year=${year - 1}`}
+            aria-label="Année précédente"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50"
+          >
+            ‹
+          </Link>
+          <span className="min-w-[3.5rem] text-center text-sm font-semibold text-slate-900">
+            {year}
+          </span>
+          <Link
+            href={`/bookings?year=${year + 1}`}
+            aria-label="Année suivante"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50"
+          >
+            ›
+          </Link>
+        </div>
+      </div>
+
+      <p className="text-sm text-slate-600">
+        Chaque branche familiale a une quinzaine prioritaire en
+        juillet-août, définie chaque année par un hôte. Vous pouvez réserver
+        n&apos;importe quelle date libre — mais si vos dates tombent pendant
+        la période prioritaire d&apos;une autre branche, votre demande sera
+        mise en attente jusqu&apos;à ce qu&apos;un membre de cette famille
+        l&apos;approuve.
       </p>
 
-      {years.length > 0 ? (
-        <div className="mt-3 space-y-3">
-          {years.map((year) => (
-            <div key={year}>
-              <p className="font-medium text-slate-900">{year}</p>
-              <ul className="mt-1 grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
-                {periods
-                  .filter((p) => p.year === year)
-                  .map((p) => {
-                    const range = parseRange(p.date_range);
-                    return (
-                      <li key={`${p.family_branch}-${p.year}`}>
-                        <span className="font-medium">{p.family_branch}</span>
-                        {range && (
-                          <>
-                            {" "}
-                            — du {formatFr(range.start)} au {formatFr(range.end)}
-                          </>
-                        )}
-                      </li>
-                    );
-                  })}
-              </ul>
-            </div>
-          ))}
+      {periodsThisYear.length > 0 ? (
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Périodes de priorité
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {periodsThisYear.map((p, i) => {
+              const color = branchColor(p.family_branch);
+              return (
+                <div
+                  key={`${p.family_branch}-${p.year}`}
+                  className="rounded-xl border p-3"
+                  style={{
+                    backgroundColor: `${color.light}55`,
+                    borderColor: color.light,
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                      style={{ backgroundColor: color.dark }}
+                    >
+                      {branchInitial(p.family_branch)}
+                    </span>
+                    <span className="truncate text-sm font-semibold text-slate-900">
+                      {p.family_branch}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-600">
+                    Période {i + 1}
+                  </p>
+                  <p className="text-sm font-medium text-slate-900">
+                    {formatShortFr(p.range.start)} – {formatShortFr(p.range.end)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : (
-        <p className="mt-3 text-slate-500">
-          Aucune période prioritaire définie pour le moment (un hôte peut en
+        <p className="text-sm text-slate-500">
+          Aucune période prioritaire définie pour {year} (un hôte peut en
           définir depuis la page Utilisateurs).
         </p>
       )}

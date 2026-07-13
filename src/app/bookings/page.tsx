@@ -1,8 +1,12 @@
 import { addDays, parseISO } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
-import BookingForm from "./BookingForm";
-import StayListItem from "./StayListItem";
+import { getBookingHeroImages } from "@/lib/bookingHeroImages";
+import BookingsHero from "./BookingsHero";
 import BookingRulesIntro from "./BookingRulesIntro";
+import SeasonTimeline from "./SeasonTimeline";
+import NewBookingSection from "./NewBookingSection";
+import StayListItem from "./StayListItem";
+import HouseRules from "./HouseRules";
 
 function formatRange(range: string) {
   // Postgres daterange comes back as a string like "[2026-07-10,2026-07-17)"
@@ -46,6 +50,7 @@ type ProfileRow = {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  family_branch: string | null;
 };
 
 // Builds the room list (with each room's already-booked ranges) for one
@@ -92,6 +97,7 @@ function groupBookings(
       roomIds: string[];
       bookingIds: string[];
       bookedBy: string;
+      bookerBranch: string | null;
       pendingBranches: string[];
     }
   >();
@@ -121,6 +127,7 @@ function groupBookings(
         roomIds: [room.id],
         bookingIds: [booking.id],
         bookedBy,
+        bookerBranch: bookerProfile?.family_branch ?? null,
         pendingBranches: booking.pending_branches ?? [],
       });
     }
@@ -129,7 +136,15 @@ function groupBookings(
   return Array.from(groups.values());
 }
 
-export default async function BookingsPage() {
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ year?: string }>;
+}) {
+  const { year: yearParam } = await searchParams;
+  const currentYear = new Date().getFullYear();
+  const selectedYear = Number(yearParam) || currentYear;
+
   const supabase = await createClient();
 
   const {
@@ -140,7 +155,6 @@ export default async function BookingsPage() {
   // instead of waiting on each round-trip in turn — on a real network (as
   // opposed to localhost), doing this sequentially can easily add a second
   // or more to the page load.
-  const currentYear = new Date().getFullYear();
   const [
     { data: houses },
     { data: rooms },
@@ -162,7 +176,7 @@ export default async function BookingsPage() {
       .select("id, room_id, user_id, date_range, guest_count, notes, created_at, status, pending_branches")
       .eq("status", "pending")
       .order("date_range"),
-    supabase.from("profiles").select("id, first_name, last_name"),
+    supabase.from("profiles").select("id, first_name, last_name, family_branch"),
     supabase
       .from("profiles")
       .select("family_branch")
@@ -171,10 +185,11 @@ export default async function BookingsPage() {
     supabase
       .from("priority_periods")
       .select("family_branch, year, date_range")
-      .gte("year", currentYear)
       .order("year")
       .order("family_branch"),
   ]);
+
+  const bookingHeroImages = getBookingHeroImages();
 
   const groupedBookings = groupBookings(
     bookings ?? [],
@@ -188,14 +203,50 @@ export default async function BookingsPage() {
     profiles ?? [],
   );
 
-  return (
-    <div className="mx-auto w-full max-w-5xl space-y-8 p-6">
-      <h1 className="text-2xl font-bold">Réservations</h1>
+  // Confirmed bookings for the selected year only — drives both the season
+  // timeline and the "Réservations {year}" list below it. Pending requests
+  // stay unfiltered (they need action regardless of which year you're
+  // currently browsing).
+  const bookingsThisYear = groupedBookings.filter((g) => {
+    const range = parseExactRange(g.dateRange);
+    return range ? range.start.getFullYear() === selectedYear : false;
+  });
 
-      <BookingRulesIntro periods={priorityPeriods ?? []} />
+  const timelineBookings = bookingsThisYear.map((g) => {
+    const range = parseExactRange(g.dateRange)!;
+    return {
+      label: g.bookedBy,
+      branch: g.bookerBranch,
+      start: range.start,
+      end: range.end,
+    };
+  });
+
+  const timelinePeriods = (priorityPeriods ?? [])
+    .filter((p) => p.year === selectedYear)
+    .map((p) => {
+      const match = p.date_range.match(/\[([\d-]+),([\d-]+)\)/);
+      return match
+        ? { family_branch: p.family_branch, start: match[1], end: match[2] }
+        : null;
+    })
+    .filter((p): p is { family_branch: string; start: string; end: string } => p !== null)
+    .sort((a, b) => a.start.localeCompare(b.start));
+
+  return (
+    <div className="mx-auto w-full max-w-5xl space-y-10 p-6">
+      <BookingsHero images={bookingHeroImages} />
+
+      <BookingRulesIntro periods={priorityPeriods ?? []} year={selectedYear} />
+
+      <SeasonTimeline
+        periods={timelinePeriods}
+        bookings={timelineBookings}
+        year={selectedYear}
+      />
 
       {houses && houses.length > 0 ? (
-        <BookingForm
+        <NewBookingSection
           houses={houses.map((house) => ({
             id: house.id,
             name: house.name,
@@ -212,8 +263,10 @@ export default async function BookingsPage() {
 
       {groupedPending.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold">Demandes en attente</h2>
-          <ul className="space-y-2">
+          <h2 className="text-lg font-semibold text-slate-900">
+            Demandes en attente
+          </h2>
+          <ul className="space-y-3">
             {groupedPending.map((group, i) => {
               const house = houses?.find((h) => h.id === group.houseId);
               const houseRoomCount = (rooms ?? []).filter(
@@ -235,6 +288,7 @@ export default async function BookingsPage() {
                   guestCount={group.guestCount}
                   notes={group.notes}
                   bookedBy={group.bookedBy}
+                  bookerBranch={group.bookerBranch}
                   isOwn={currentUser?.id === group.userId}
                   bookingIds={group.bookingIds}
                   editRooms={buildHouseRooms(
@@ -256,14 +310,16 @@ export default async function BookingsPage() {
       )}
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Séjours à venir</h2>
-        {groupedBookings.length === 0 && (
+        <h2 className="text-lg font-semibold text-slate-900">
+          Réservations {selectedYear}
+        </h2>
+        {bookingsThisYear.length === 0 && (
           <p className="text-sm text-slate-500">
-            Aucune réservation pour le moment.
+            Aucune réservation pour {selectedYear}.
           </p>
         )}
-        <ul className="space-y-2">
-          {groupedBookings.map((group, i) => {
+        <ul className="space-y-3">
+          {bookingsThisYear.map((group, i) => {
             const house = houses?.find((h) => h.id === group.houseId);
             const houseRoomCount = (rooms ?? []).filter(
               (r) => r.house_id === group.houseId,
@@ -281,6 +337,7 @@ export default async function BookingsPage() {
                 guestCount={group.guestCount}
                 notes={group.notes}
                 bookedBy={group.bookedBy}
+                bookerBranch={group.bookerBranch}
                 isOwn={currentUser?.id === group.userId}
                 bookingIds={group.bookingIds}
                 editRooms={buildHouseRooms(
@@ -297,6 +354,8 @@ export default async function BookingsPage() {
           })}
         </ul>
       </div>
+
+      <HouseRules />
     </div>
   );
 }
