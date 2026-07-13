@@ -18,17 +18,22 @@ export default function BookingsHero({ images }: { images: string[] }) {
 
       <div className="absolute inset-0 bg-black/35" />
 
-      <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-white/90">
-          Réservation
-        </p>
-        <h1 className="mt-2 text-3xl font-bold text-white drop-shadow-lg sm:text-4xl">
-          L&apos;Île d&apos;Yeu
-        </h1>
-        <p className="mt-1 max-w-lg text-sm text-white/90 drop-shadow sm:text-base">
-          Agenda partagé des maisons familiales · règles de priorité
-          saisonnières
-        </p>
+      <div className="absolute inset-0 flex flex-col justify-end">
+        {/* Same max-w-5xl + horizontal padding as the page content below,
+            so the hero text lines up with it instead of the full-bleed
+            image edge. */}
+        <div className="mx-auto w-full max-w-5xl px-6 pb-6 sm:pb-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/90">
+            Réservation
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-white drop-shadow-lg sm:text-4xl">
+            L&apos;Île d&apos;Yeu
+          </h1>
+          <p className="mt-1 max-w-lg text-sm text-white/90 drop-shadow sm:text-base">
+            Agenda partagé des maisons familiales · règles de priorité
+            saisonnières
+          </p>
+        </div>
       </div>
     </div>
   );

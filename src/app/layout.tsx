@@ -4,6 +4,7 @@ import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./login/actions";
 import SiteHeader from "./SiteHeader";
+import GoogleAnalytics from "./GoogleAnalytics";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -61,6 +62,7 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={`${nunito.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
         {user && (
           <SiteHeader
             navLinks={NAV_LINKS}

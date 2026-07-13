@@ -161,6 +161,27 @@ photo into `public/bookings-hero/` (any filename, `.jpg`/`.jpeg`/`.png`/`.webp`)
 — the first one found (alphabetical order) is used automatically. With none
 added, it falls back to a plain brand-colored gradient.
 
+## 3.8 Google Analytics (optional)
+
+1. Go to [analytics.google.com](https://analytics.google.com) → Admin →
+   create an Account (if you don't have one) → create a Property for this
+   site.
+2. During property setup choose "Web" as the platform and enter your site
+   URL. This gives you a **Measurement ID** shaped like `G-XXXXXXXXXX`
+   (Admin → Data Streams → your stream → Measurement ID).
+3. Add it to `.env.local`:
+   ```
+   NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+   ```
+4. For the live site, add the same `NEXT_PUBLIC_GA_ID` variable in Vercel
+   (Project → Settings → Environment Variables), then redeploy — env vars
+   starting with `NEXT_PUBLIC_` are baked in at build time, so a redeploy is
+   required after adding or changing it.
+
+Leave it blank (or unset) to run with no analytics at all — nothing loads
+and nothing breaks. Traffic data appears in Google Analytics within a
+minute or two of a real visit; give it a few hours for full reports.
+
 ## 4. Run it locally
 
 ```bash

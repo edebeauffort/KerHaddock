@@ -1,5 +1,4 @@
 import { addDays } from "date-fns";
-import { FAMILY_BRANCHES } from "@/lib/familyBranches";
 import { branchColor } from "@/lib/branchColors";
 
 type PeriodInput = { family_branch: string; start: string; end: string };
@@ -311,21 +310,6 @@ export default function SeasonTimeline({
             )}
           </div>
         )}
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600">
-        {FAMILY_BRANCHES.map((branch) => {
-          const color = branchColor(branch);
-          return (
-            <span key={branch} className="flex items-center gap-1.5">
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: color.dark }}
-              />
-              {branch}
-            </span>
-          );
-        })}
       </div>
     </div>
   );
