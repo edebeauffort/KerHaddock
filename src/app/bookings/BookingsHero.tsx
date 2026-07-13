@@ -1,26 +1,17 @@
 import Image from "next/image";
 
-// Full-width banner across the top of the booking page: up to 3 photos
-// side by side (fewer is fine, it adapts), with a dark overlay and the
-// page title on top. Falls back to a plain brand-colored gradient if no
-// photos have been added yet (see src/lib/bookingHeroImages.ts).
+// Full-bleed banner across the top of the booking page — one photo,
+// edge-to-edge (not confined to the page's centered max-width), with a
+// dark overlay and the page title on top. Falls back to a plain
+// brand-colored gradient if no photo has been added yet (see
+// src/lib/bookingHeroImages.ts).
 export default function BookingsHero({ images }: { images: string[] }) {
+  const image = images[0];
+
   return (
-    <div className="relative h-72 w-full overflow-hidden rounded-2xl sm:h-80">
-      {images.length > 0 ? (
-        <div className="absolute inset-0 flex">
-          {images.map((src, i) => (
-            <div key={src} className="relative h-full flex-1">
-              <Image
-                src={src}
-                alt=""
-                fill
-                priority={i === 0}
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
+    <div className="relative h-64 w-full sm:h-80">
+      {image ? (
+        <Image src={image} alt="" fill priority className="object-cover" />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-brand-sage to-brand-mint" />
       )}
@@ -28,7 +19,7 @@ export default function BookingsHero({ images }: { images: string[] }) {
       <div className="absolute inset-0 bg-black/35" />
 
       <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white/90">
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/90">
           Réservation
         </p>
         <h1 className="mt-2 text-3xl font-bold text-white drop-shadow-lg sm:text-4xl">

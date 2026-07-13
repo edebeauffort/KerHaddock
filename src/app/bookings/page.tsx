@@ -234,10 +234,11 @@ export default async function BookingsPage({
     .sort((a, b) => a.start.localeCompare(b.start));
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-10 p-6">
+    <div className="w-full">
       <BookingsHero images={bookingHeroImages} />
 
-      <BookingRulesIntro periods={priorityPeriods ?? []} year={selectedYear} />
+      <div className="mx-auto w-full max-w-5xl space-y-10 p-6">
+        <BookingRulesIntro periods={priorityPeriods ?? []} year={selectedYear} />
 
       <SeasonTimeline
         periods={timelinePeriods}
@@ -355,7 +356,8 @@ export default async function BookingsPage({
         </ul>
       </div>
 
-      <HouseRules />
+        <HouseRules />
+      </div>
     </div>
   );
 }

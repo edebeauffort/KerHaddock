@@ -156,10 +156,10 @@ If `public/hero/` is empty or missing, it falls back to a single
 
 ## 3.7 Booking page banner photos (optional)
 
-The Réservations page has a photo banner at the top, up to 3 images side by
-side. Drop up to 3 photos into `public/bookings-hero/` (any filenames,
-`.jpg`/`.jpeg`/`.png`/`.webp`) — picked up automatically in filename order.
-With none added, it falls back to a plain brand-colored gradient.
+The Réservations page has a full-width photo banner at the top. Drop a
+photo into `public/bookings-hero/` (any filename, `.jpg`/`.jpeg`/`.png`/`.webp`)
+— the first one found (alphabetical order) is used automatically. With none
+added, it falls back to a plain brand-colored gradient.
 
 ## 4. Run it locally
 

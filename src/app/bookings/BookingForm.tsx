@@ -240,6 +240,8 @@ export default function BookingForm({
         <div className="overflow-x-auto">
           <DayPicker
             mode="range"
+            locale={fr}
+            weekStartsOn={1}
             selected={{ from: arrival, to: departure }}
             onDayClick={handleDayClick}
             disabled={(date) =>
