@@ -155,7 +155,7 @@ export default function BookingRulesIntro({
         </span>
         <p>
           Chaque branche familiale a une quinzaine prioritaire en
-          juillet-août, définie chaque année par un hôte. Vous pouvez
+          juillet-août, sous forme de tournante annuelle. Vous pouvez
           réserver n&apos;importe quelle date libre — mais si vos dates
           tombent pendant la période prioritaire d&apos;une autre branche,
           votre demande sera mise en attente jusqu&apos;à ce qu&apos;un

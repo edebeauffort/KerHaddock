@@ -2,7 +2,7 @@ const RULES = [
   {
     title: "Périodes prioritaires",
     description:
-      "Chaque branche familiale a une quinzaine prioritaire en juillet-août, définie chaque année par un hôte depuis la page Utilisateurs.",
+      "Chaque branche familiale a une quinzaine prioritaire en juillet-août, sous forme de tournante annuelle depuis la page Utilisateurs.",
   },
   {
     title: "Réservation hors priorité",

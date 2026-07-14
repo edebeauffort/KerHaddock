@@ -10,6 +10,7 @@ type User = {
   email: string | null;
   family_branch: string | null;
   role: string;
+  active: boolean;
 };
 
 export default function UsersManager({

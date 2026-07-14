@@ -11,6 +11,7 @@ type User = {
   email: string | null;
   family_branch: string | null;
   role: string;
+  active: boolean;
 };
 
 const initialState: UserActionState = {};
@@ -137,7 +138,18 @@ export default function UserRow({
         <span className="text-slate-500">
           — {user.email} — {user.family_branch ?? "branche non définie"} —{" "}
           {ROLE_LABELS[user.role] ?? user.role}
-        </span>
+        </span>{" "}
+        {user.active ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand-mint/40 px-2 py-0.5 text-xs font-medium text-brand-teal-dark">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-teal" />
+            Actif
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+            Invitation en attente
+          </span>
+        )}
       </div>
       <div className="flex gap-3">
         <button
