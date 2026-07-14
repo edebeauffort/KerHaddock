@@ -78,12 +78,30 @@ create table if not exists public.priority_periods (
   exclude using gist (date_range with &&)
 );
 
+-- Family memories: one entry per stay, with a cover photo, an optional
+-- Google Photos album link, and a short anecdote.
+create table if not exists public.memories (
+  id uuid primary key default gen_random_uuid(),
+  house_id uuid references public.houses (id) on delete cascade,
+  date_range daterange not null,
+  google_photos_url text,
+  cover_photo_path text,
+  anecdote text,
+  weather_summary text,
+  participant_ids uuid[] not null default '{}',
+  created_by uuid references auth.users (id),
+  created_at timestamptz not null default now(),
+
+  exclude using gist (house_id with =, date_range with &&)
+);
+
 -- --- Row Level Security: family members only, nothing public ---
 alter table public.profiles enable row level security;
 alter table public.houses enable row level security;
 alter table public.rooms enable row level security;
 alter table public.bookings enable row level security;
 alter table public.priority_periods enable row level security;
+alter table public.memories enable row level security;
 
 drop policy if exists "Members can view all profiles" on public.profiles;
 create policy "Members can view all profiles" on public.profiles
@@ -167,6 +185,50 @@ create policy "Hosts can delete priority periods" on public.priority_periods
   for delete using (
     exists (select 1 from public.profiles me where me.id = auth.uid() and me.role = 'host')
   );
+
+drop policy if exists "Members can view memories" on public.memories;
+create policy "Members can view memories" on public.memories
+  for select using (auth.uid() is not null);
+
+drop policy if exists "Members can create memories" on public.memories;
+create policy "Members can create memories" on public.memories
+  for insert with check (auth.uid() is not null);
+
+drop policy if exists "Author or host can update memories" on public.memories;
+create policy "Author or host can update memories" on public.memories
+  for update using (
+    created_by = auth.uid()
+    or exists (select 1 from public.profiles me where me.id = auth.uid() and me.role = 'host')
+  );
+
+drop policy if exists "Author or host can delete memories" on public.memories;
+create policy "Author or host can delete memories" on public.memories
+  for delete using (
+    created_by = auth.uid()
+    or exists (select 1 from public.profiles me where me.id = auth.uid() and me.role = 'host')
+  );
+
+-- Storage bucket for memory cover photos — public read (same trust model
+-- as every other photo in this app), writes require a logged-in member.
+insert into storage.buckets (id, name, public)
+values ('memories', 'memories', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public can view memory photos" on storage.objects;
+create policy "Public can view memory photos" on storage.objects
+  for select using (bucket_id = 'memories');
+
+drop policy if exists "Members can upload memory photos" on storage.objects;
+create policy "Members can upload memory photos" on storage.objects
+  for insert with check (bucket_id = 'memories' and auth.uid() is not null);
+
+drop policy if exists "Members can update their own memory photos" on storage.objects;
+create policy "Members can update their own memory photos" on storage.objects
+  for update using (bucket_id = 'memories' and owner = auth.uid());
+
+drop policy if exists "Members can delete their own memory photos" on storage.objects;
+create policy "Members can delete their own memory photos" on storage.objects
+  for delete using (bucket_id = 'memories' and owner = auth.uid());
 
 -- Auto-create a profile row whenever a host invites a new family member —
 -- first_name/last_name/family_branch/role come from the invite metadata.

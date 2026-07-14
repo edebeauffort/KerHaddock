@@ -146,9 +146,10 @@ the exact filenames listed in `src/lib/bookingOptionImages.ts` (e.g.
 `grande-maison-entiere.jpg`, `dortoir.jpg`). Any option missing a file just
 shows a plain colored button instead of a photo, nothing breaks.
 
-## 3.6 Homepage photo carousel (optional)
+## 3.6 Login page photo carousel (optional)
 
-The homepage hero cycles through photos automatically. Drop any number of
+The login page's background cycles through photos automatically (the
+homepage itself no longer has a photo hero — see 3.9). Drop any number of
 photos into `public/hero/` (any filenames, `.jpg`/`.jpeg`/`.png`/`.webp`) —
 they're picked up automatically in filename order, no code changes needed.
 If `public/hero/` is empty or missing, it falls back to a single
@@ -161,7 +162,28 @@ photo into `public/bookings-hero/` (any filename, `.jpg`/`.jpeg`/`.png`/`.webp`)
 — the first one found (alphabetical order) is used automatically. With none
 added, it falls back to a plain brand-colored gradient.
 
-## 3.8 Google Analytics (optional)
+## 3.8 Memories (run migration 0009)
+
+The homepage now leads with a "Souvenirs" (Memories) section — one entry
+per stay, with a cover photo, an optional Google Photos album link, and a
+short anecdote, plus a "same time last year" highlight when a past memory
+matches the season of your next stay. This needs a new table and a new
+Supabase Storage bucket for cover photos:
+
+1. Run `supabase/migrations/0009_memories.sql` once in the Supabase SQL
+   editor (or the full `schema.sql` for a brand new project — it's included
+   there too).
+2. That's it — the migration also creates the `memories` Storage bucket and
+   its access policies via SQL, so there's no separate manual bucket-setup
+   step in the Supabase dashboard.
+
+Anyone can add a memory (for whichever stay is current or next up); only
+its author or a host can edit or delete it afterwards. Cover photos are
+public-read (same trust model as every other photo on this site — nothing
+is secret beyond "you need the link"), uploads require a logged-in family
+member.
+
+## 3.9 Google Analytics (optional)
 
 1. Go to [analytics.google.com](https://analytics.google.com) → Admin →
    create an Account (if you don't have one) → create a Property for this
@@ -228,6 +250,7 @@ Visit `http://localhost:3000` — you'll be redirected to `/login`.
 | Restaurants + map | 🚧 stub — Phase 4 |
 | User management (host/guest roles, Utilisateurs page) | ✅ working |
 | Priority booking periods per family branch + approval workflow | ✅ working — a host sets each branch's 2-week priority window per year in Utilisateurs; a booking that lands in another branch's window goes to "pending" and emails that branch (any member can approve from the Réservations page), then emails the requester once approved. See `supabase/migrations/0008_priority_periods_and_approvals.sql`. |
+| Homepage: next stay, weather, webcam, and a "Souvenirs" (Memories) section (add via a 3-step flow, browse an archive, view a detail page, "same time last year" highlight) | ✅ working — see `supabase/migrations/0009_memories.sql` and README 3.8. |
 
 ## Notes
 

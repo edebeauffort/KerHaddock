@@ -23,7 +23,7 @@ const NAV_LINKS = [
   { href: "/bookings", label: "Réservations", ready: true },
   { href: "/weather", label: "Météo", ready: true },
   { href: "/webcam", label: "Webcam", ready: true },
-  { href: "/gallery", label: "Galerie", ready: false },
+  { href: "/memories", label: "Livre d'or", ready: true },
   { href: "/tips", label: "Astuces", ready: false },
   { href: "/restaurants", label: "Restaurants", ready: false },
 ];
