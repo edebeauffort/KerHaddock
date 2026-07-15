@@ -77,3 +77,16 @@ body {
 .hh-calendar .rdp-nav {
   z-index: 5;
 }
+
+/* Our date pill fields open a custom calendar on click, so the browser's
+   own calendar icon inside the native <input type="date"> is redundant
+   clutter (and duplicates the affordance) — hide it. */
+.hh-date-input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.hh-date-input::-webkit-inner-spin-button,
+.hh-date-input::-webkit-clear-button {
+  display: none;
+}

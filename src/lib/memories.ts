@@ -6,6 +6,7 @@ export type MemoryRow = {
   date_range: string;
   google_photos_url: string | null;
   cover_photo_path: string | null;
+  photo_paths: string[];
   anecdote: string | null;
   weather_summary: string | null;
   participant_ids: string[];
@@ -26,6 +27,23 @@ export function memoryPhotoUrl(
 ): string | null {
   if (!path) return null;
   return supabase.storage.from("memories").getPublicUrl(path).data.publicUrl;
+}
+
+// Public URLs for every photo on a memory, in slot order (the first one is
+// the "big" cover photo). Falls back to the legacy single cover_photo_path
+// for memories saved before multi-photo support existed.
+export function memoryPhotoUrls(
+  supabase: SupabaseClient,
+  memory: Pick<MemoryRow, "photo_paths" | "cover_photo_path">,
+): string[] {
+  const paths = memory.photo_paths?.length
+    ? memory.photo_paths
+    : memory.cover_photo_path
+      ? [memory.cover_photo_path]
+      : [];
+  return paths
+    .map((path) => memoryPhotoUrl(supabase, path))
+    .filter((url): url is string => !!url);
 }
 
 // French season label from a start date, matching how the reference design
@@ -56,7 +74,7 @@ export async function getAllMemories(
   const { data } = await supabase
     .from("memories")
     .select(
-      "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
+      "id, house_id, date_range, google_photos_url, cover_photo_path, photo_paths, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
     );
   const rows = (data ?? []) as MemoryRow[];
   return rows.sort((a, b) => {

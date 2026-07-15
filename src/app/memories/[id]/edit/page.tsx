@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { parseMemoryRange, memoryPhotoUrl } from "@/lib/memories";
+import { parseMemoryRange, memoryPhotoUrls } from "@/lib/memories";
 import EditMemoryForm from "./EditMemoryForm";
+
+type Profile = { id: string; first_name: string | null; family_branch: string | null };
 
 export default async function EditMemoryPage({
   params,
@@ -10,16 +12,21 @@ export default async function EditMemoryPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: memory } = await supabase
-    .from("memories")
-    .select("id, date_range, google_photos_url, anecdote, other_guests_count, cover_photo_path")
-    .eq("id", id)
-    .single();
+  const [{ data: memory }, { data: profiles }] = await Promise.all([
+    supabase
+      .from("memories")
+      .select(
+        "id, date_range, google_photos_url, anecdote, other_guests_count, cover_photo_path, photo_paths, participant_ids",
+      )
+      .eq("id", id)
+      .single(),
+    supabase.from("profiles").select("id, first_name, family_branch").order("first_name"),
+  ]);
 
   if (!memory) notFound();
 
   const range = parseMemoryRange(memory.date_range);
-  const coverPhotoUrl = memoryPhotoUrl(supabase, memory.cover_photo_path);
+  const photoUrls = memoryPhotoUrls(supabase, memory);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6 p-6">
@@ -31,7 +38,9 @@ export default async function EditMemoryPage({
         initialGooglePhotosUrl={memory.google_photos_url}
         initialAnecdote={memory.anecdote}
         initialOtherGuestsCount={memory.other_guests_count ?? 0}
-        initialCoverPhotoUrl={coverPhotoUrl}
+        initialPhotoUrls={photoUrls}
+        initialParticipantIds={memory.participant_ids ?? []}
+        allProfiles={(profiles ?? []) as Profile[]}
       />
     </div>
   );

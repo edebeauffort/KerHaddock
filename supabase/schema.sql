@@ -86,6 +86,7 @@ create table if not exists public.memories (
   date_range daterange not null,
   google_photos_url text,
   cover_photo_path text,
+  photo_paths text[] not null default '{}',
   anecdote text,
   weather_summary text,
   participant_ids uuid[] not null default '{}',

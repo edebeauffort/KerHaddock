@@ -7,6 +7,7 @@ import "react-day-picker/style.css";
 import { addDays, addMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { createMemory, type MemoryActionState } from "../actions";
+import PhotoSlot from "../PhotoSlot";
 
 type Person = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -31,7 +32,7 @@ export default function NewMemoryStepper({
 }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
   const [arrival, setArrival] = useState<Date | undefined>(
     initialStartISO ? new Date(`${initialStartISO}T00:00:00`) : undefined,
   );
@@ -77,7 +78,6 @@ export default function NewMemoryStepper({
       setArrival(day);
     } else {
       setDeparture(day);
-      setCalendarOpen(false);
     }
   }
 
@@ -148,7 +148,7 @@ export default function NewMemoryStepper({
                     onChange={(e) => handleArrivalInput(e.target.value)}
                     onFocus={openCalendar}
                     onClick={openCalendar}
-                    className="mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
+                    className="hh-date-input mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
                     aria-label="Arrivée"
                   />
                 </label>
@@ -163,7 +163,7 @@ export default function NewMemoryStepper({
                     onChange={(e) => handleDepartureInput(e.target.value)}
                     onFocus={openCalendar}
                     onClick={openCalendar}
-                    className="mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
+                    className="hh-date-input mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
                     aria-label="Départ"
                   />
                 </label>
@@ -212,6 +212,14 @@ export default function NewMemoryStepper({
                     className="hh-calendar mx-auto"
                   />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setCalendarOpen(false)}
+                  disabled={!arrival || !departure}
+                  className="mt-2 w-full rounded-full bg-brand-teal px-4 py-2 text-sm font-semibold text-white hover:bg-brand-teal-dark disabled:opacity-40"
+                >
+                  Confirmer les dates
+                </button>
               </div>
             )}
           </div>
@@ -273,36 +281,15 @@ export default function NewMemoryStepper({
           </button>
         </div>
 
-        {/* Step 2 — cover photo */}
+        {/* Step 2 — photos (up to 3: one big cover + two smaller ones) */}
         <div className={step === 2 ? "space-y-3" : "hidden"}>
-          <h2 className="text-xl font-semibold text-slate-900">Photo de couverture</h2>
-          <label
-            htmlFor="coverPhoto"
-            className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-center"
-            style={
-              coverPreview
-                ? { backgroundImage: `url(${coverPreview})`, backgroundSize: "cover", backgroundPosition: "center" }
-                : undefined
-            }
-          >
-            {!coverPreview && (
-              <>
-                <span className="text-2xl">📷</span>
-                <span className="text-sm text-slate-500">Choisir une photo</span>
-              </>
-            )}
-          </label>
-          <input
-            id="coverPhoto"
-            type="file"
-            name="coverPhoto"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setCoverPreview(URL.createObjectURL(file));
-            }}
-          />
+          <h2 className="text-xl font-semibold text-slate-900">Photos</h2>
+          <p className="text-xs text-slate-500">Jusqu&apos;à 3 photos — la première sera la photo principale.</p>
+          <div className="grid aspect-video grid-cols-2 grid-rows-2 gap-2">
+            <PhotoSlot id="photo1" name="photo1" big />
+            <PhotoSlot id="photo2" name="photo2" />
+            <PhotoSlot id="photo3" name="photo3" />
+          </div>
 
           <div className="flex flex-col gap-2 pt-2">
             <button

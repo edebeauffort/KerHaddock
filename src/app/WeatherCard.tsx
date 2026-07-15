@@ -58,7 +58,11 @@ export default function WeatherCard({ weather }: { weather: CurrentWeather | nul
             {weather.high !== null && weather.low !== null && (
               <p>↑{weather.high}° ↓{weather.low}°</p>
             )}
-            {wind && <p>Vent : {wind.label}</p>}
+            {wind && (
+              <p>
+                Vent : {wind.label} — force {wind.force} Beaufort
+              </p>
+            )}
           </div>
         </>
       ) : (

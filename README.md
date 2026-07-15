@@ -162,7 +162,7 @@ photo into `public/bookings-hero/` (any filename, `.jpg`/`.jpeg`/`.png`/`.webp`)
 — the first one found (alphabetical order) is used automatically. With none
 added, it falls back to a plain brand-colored gradient.
 
-## 3.8 Memories (run migrations 0009, 0010, and 0011)
+## 3.8 Memories (run migrations 0009 through 0012)
 
 The homepage now leads with a "Souvenirs" (Memories) section — one entry
 per stay, with a cover photo, an optional Google Photos album link, and a
@@ -195,6 +195,10 @@ logged-in family member.
 - `supabase/migrations/0011_memories_drop_date_exclusion.sql` — removes the
   one-memory-per-overlapping-date-range restriction, so more than one
   memory can be added for the same (or overlapping) dates.
+- `supabase/migrations/0012_memories_multi_photos.sql` — adds the
+  `photo_paths` column so a memory can have up to 3 photos (one big cover +
+  two smaller ones) instead of a single cover photo; backfills existing
+  memories' single photo into the new column automatically.
 
 ## 3.9 Google Analytics (optional)
 

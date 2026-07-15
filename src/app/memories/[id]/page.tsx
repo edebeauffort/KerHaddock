@@ -6,7 +6,7 @@ import {
   parseMemoryRange,
   seasonLabel,
   seasonIcon,
-  memoryPhotoUrl,
+  memoryPhotoUrls,
 } from "@/lib/memories";
 import { formatDateRangeFr } from "@/lib/formatDateRange";
 import DeleteMemoryButton from "../DeleteMemoryButton";
@@ -26,7 +26,7 @@ export default async function MemoryDetailPage({
     supabase
       .from("memories")
       .select(
-        "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
+        "id, house_id, date_range, google_photos_url, cover_photo_path, photo_paths, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
       )
       .eq("id", id)
       .single(),
@@ -54,7 +54,7 @@ export default async function MemoryDetailPage({
     ? profileById.get(memory.created_by)?.first_name ?? null
     : null;
 
-  const photoUrl = memoryPhotoUrl(supabase, memory.cover_photo_path);
+  const photoUrls = memoryPhotoUrls(supabase, memory);
   // Any logged-in member can attempt to edit — RLS (author or host) is the
   // real gate, enforced server-side when the edit is actually submitted.
   const canEdit = !!user;
@@ -95,13 +95,34 @@ export default async function MemoryDetailPage({
         </div>
       )}
 
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100">
-        {photoUrl ? (
-          <Image src={photoUrl} alt="" fill className="object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-brand-sage to-brand-mint" />
-        )}
-      </div>
+      {photoUrls.length >= 3 ? (
+        <div className="grid aspect-video w-full grid-cols-2 grid-rows-2 gap-2">
+          <div className="relative row-span-2 overflow-hidden rounded-2xl bg-slate-100">
+            <Image src={photoUrls[0]} alt="" fill className="object-cover" />
+          </div>
+          {photoUrls.slice(1, 3).map((url, i) => (
+            <div key={i} className="relative overflow-hidden rounded-2xl bg-slate-100">
+              <Image src={url} alt="" fill className="object-cover" />
+            </div>
+          ))}
+        </div>
+      ) : photoUrls.length === 2 ? (
+        <div className="grid aspect-video w-full grid-cols-2 gap-2">
+          {photoUrls.map((url, i) => (
+            <div key={i} className="relative overflow-hidden rounded-2xl bg-slate-100">
+              <Image src={url} alt="" fill className="object-cover" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100">
+          {photoUrls[0] ? (
+            <Image src={photoUrls[0]} alt="" fill className="object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-brand-sage to-brand-mint" />
+          )}
+        </div>
+      )}
 
       {memory.anecdote && (
         <blockquote className="border-l-4 border-brand-sage pl-4 text-lg italic text-slate-700">

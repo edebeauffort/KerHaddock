@@ -7,12 +7,15 @@ import "react-day-picker/style.css";
 import { addDays, addMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { updateMemory, type MemoryActionState } from "../../actions";
+import PhotoSlot from "../../PhotoSlot";
 
 const initialState: MemoryActionState = {};
 
 function fmt(date: Date) {
   return format(date, "yyyy-MM-dd");
 }
+
+type Person = { id: string; first_name: string | null; family_branch: string | null };
 
 export default function EditMemoryForm({
   memoryId,
@@ -21,7 +24,9 @@ export default function EditMemoryForm({
   initialGooglePhotosUrl,
   initialAnecdote,
   initialOtherGuestsCount,
-  initialCoverPhotoUrl,
+  initialPhotoUrls,
+  initialParticipantIds,
+  allProfiles,
 }: {
   memoryId: string;
   initialStartISO: string;
@@ -29,12 +34,15 @@ export default function EditMemoryForm({
   initialGooglePhotosUrl: string | null;
   initialAnecdote: string | null;
   initialOtherGuestsCount: number;
-  initialCoverPhotoUrl: string | null;
+  initialPhotoUrls: string[];
+  initialParticipantIds: string[];
+  allProfiles: Person[];
 }) {
   const router = useRouter();
   const [anecdote, setAnecdote] = useState(initialAnecdote ?? "");
   const [otherGuestsCount, setOtherGuestsCount] = useState(initialOtherGuestsCount);
-  const [coverPreview, setCoverPreview] = useState<string | null>(initialCoverPhotoUrl);
+  const [participantIds, setParticipantIds] = useState<string[]>(initialParticipantIds);
+
   const [arrival, setArrival] = useState<Date | undefined>(
     initialStartISO ? new Date(`${initialStartISO}T00:00:00`) : undefined,
   );
@@ -55,6 +63,10 @@ export default function EditMemoryForm({
     initialState,
   );
 
+  function toggleParticipant(id: string) {
+    setParticipantIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+  }
+
   function openCalendar() {
     setCalendarMonth(arrival ?? departure ?? new Date());
     setCalendarOpen(true);
@@ -73,7 +85,6 @@ export default function EditMemoryForm({
       setArrival(day);
     } else {
       setDeparture(day);
-      setCalendarOpen(false);
     }
   }
 
@@ -105,6 +116,9 @@ export default function EditMemoryForm({
       <input type="hidden" name="memoryId" value={memoryId} />
       <input type="hidden" name="startDate" value={startDate} />
       <input type="hidden" name="endDate" value={endDate} />
+      {participantIds.map((id) => (
+        <input key={id} type="hidden" name="participantIds" value={id} />
+      ))}
 
       <div>
         <label className="block text-sm font-medium text-slate-700">Dates du séjour</label>
@@ -120,7 +134,7 @@ export default function EditMemoryForm({
                 onChange={(e) => handleArrivalInput(e.target.value)}
                 onFocus={openCalendar}
                 onClick={openCalendar}
-                className="mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
+                className="hh-date-input mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
                 aria-label="Arrivée"
               />
             </label>
@@ -135,7 +149,7 @@ export default function EditMemoryForm({
                 onChange={(e) => handleDepartureInput(e.target.value)}
                 onFocus={openCalendar}
                 onClick={openCalendar}
-                className="mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
+                className="hh-date-input mt-0.5 block w-full border-0 bg-transparent p-0 text-sm text-slate-700 outline-none"
                 aria-label="Départ"
               />
             </label>
@@ -184,8 +198,39 @@ export default function EditMemoryForm({
                 className="hh-calendar mx-auto"
               />
             </div>
+            <button
+              type="button"
+              onClick={() => setCalendarOpen(false)}
+              disabled={!arrival || !departure}
+              className="mt-2 w-full rounded-full bg-brand-teal px-4 py-2 text-sm font-semibold text-white hover:bg-brand-teal-dark disabled:opacity-40"
+            >
+              Confirmer les dates
+            </button>
           </div>
         )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700">Participants</label>
+        <div className="mt-1.5 flex flex-wrap gap-2">
+          {allProfiles.map((p) => {
+            const checked = participantIds.includes(p.id);
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => toggleParticipant(p.id)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  checked
+                    ? "border-brand-teal bg-brand-teal text-white"
+                    : "border-slate-300 bg-white text-slate-600 hover:border-brand-teal"
+                }`}
+              >
+                {p.first_name ?? "?"}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div>
@@ -202,37 +247,32 @@ export default function EditMemoryForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700">Photo de couverture</label>
-        <label
-          htmlFor="coverPhoto"
-          className="mt-1 flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-center"
-          style={
-            coverPreview
-              ? { backgroundImage: `url(${coverPreview})`, backgroundSize: "cover", backgroundPosition: "center" }
-              : undefined
-          }
-        >
-          {!coverPreview && (
-            <>
-              <span className="text-2xl">📷</span>
-              <span className="text-sm text-slate-500">Choisir une photo</span>
-            </>
-          )}
-        </label>
-        <input
-          id="coverPhoto"
-          type="file"
-          name="coverPhoto"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) setCoverPreview(URL.createObjectURL(file));
-          }}
-        />
-        <p className="mt-1 text-xs text-slate-400">
-          Choisissez une nouvelle photo pour remplacer l&apos;actuelle, ou laissez-la telle quelle.
+        <label className="block text-sm font-medium text-slate-700">Photos</label>
+        <p className="text-xs text-slate-500">
+          Jusqu&apos;à 3 photos — la première est la photo principale. Choisissez une nouvelle
+          photo pour remplacer un emplacement, ou cliquez sur × pour le vider.
         </p>
+        <div className="mt-1.5 grid aspect-video grid-cols-2 grid-rows-2 gap-2">
+          <PhotoSlot
+            id="photo1"
+            name="photo1"
+            big
+            initialPreview={initialPhotoUrls[0] ?? null}
+            clearFieldName="clearPhoto1"
+          />
+          <PhotoSlot
+            id="photo2"
+            name="photo2"
+            initialPreview={initialPhotoUrls[1] ?? null}
+            clearFieldName="clearPhoto2"
+          />
+          <PhotoSlot
+            id="photo3"
+            name="photo3"
+            initialPreview={initialPhotoUrls[2] ?? null}
+            clearFieldName="clearPhoto3"
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between rounded-lg border border-slate-300 bg-white px-4 py-2.5">
