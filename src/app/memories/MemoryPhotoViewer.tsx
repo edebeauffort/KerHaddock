@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 // Inline full-size photo viewer for the memory detail page — no modal.
-// Shows the complete, uncropped photo (object-contain, letterboxed rather
-// than cropped) with left/right arrows and a counter when there's more
-// than one, right in the page flow.
+// Uses a plain <img> (not next/image) sized at full width with natural
+// height, rather than a fixed aspect-ratio box: that's what lets each
+// photo show completely, at full width, with no cropping and no
+// letterboxing bars regardless of its own aspect ratio. Left/right arrows
+// and a counter float on top when there's more than one photo.
 export default function MemoryPhotoViewer({ photoUrls }: { photoUrls: string[] }) {
   const [index, setIndex] = useState(0);
 
@@ -19,8 +20,12 @@ export default function MemoryPhotoViewer({ photoUrls }: { photoUrls: string[] }
   }
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-900">
-      <Image src={photoUrls[index]} alt="" fill className="object-contain" />
+    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100">
+      {/* eslint-disable-next-line @next/next/no-img-element -- natural
+          intrinsic sizing (full width, auto height) needs a plain <img>;
+          next/image requires either known dimensions or a fixed-size
+          parent, which is exactly the letterboxing this avoids. */}
+      <img src={photoUrls[index]} alt="" className="block w-full" />
 
       {photoUrls.length > 1 && (
         <>
