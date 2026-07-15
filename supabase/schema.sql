@@ -89,10 +89,9 @@ create table if not exists public.memories (
   anecdote text,
   weather_summary text,
   participant_ids uuid[] not null default '{}',
+  other_guests_count int not null default 0,
   created_by uuid references auth.users (id),
-  created_at timestamptz not null default now(),
-
-  exclude using gist (house_id with =, date_range with &&)
+  created_at timestamptz not null default now()
 );
 
 -- --- Row Level Security: family members only, nothing public ---

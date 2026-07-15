@@ -69,3 +69,11 @@ body {
 .hh-calendar .rdp-weekday {
   font-size: 0.8125rem;
 }
+
+/* With 2 months side by side, the shared prev/next nav sits at the
+   top-right corner of the whole widget — i.e. over the second month — and
+   without a z-index the month grid (painted after it in DOM order) covers
+   it, silently swallowing clicks on both arrows. */
+.hh-calendar .rdp-nav {
+  z-index: 5;
+}

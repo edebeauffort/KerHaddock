@@ -9,6 +9,7 @@ export type MemoryRow = {
   anecdote: string | null;
   weather_summary: string | null;
   participant_ids: string[];
+  other_guests_count: number;
   created_by: string | null;
   created_at: string;
 };
@@ -55,7 +56,7 @@ export async function getAllMemories(
   const { data } = await supabase
     .from("memories")
     .select(
-      "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, created_by, created_at",
+      "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
     );
   const rows = (data ?? []) as MemoryRow[];
   return rows.sort((a, b) => {

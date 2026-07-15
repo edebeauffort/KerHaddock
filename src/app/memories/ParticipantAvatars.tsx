@@ -1,4 +1,4 @@
-import { branchColor } from "@/lib/branchColors";
+import { avatarColor } from "@/lib/branchColors";
 
 type Person = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -14,7 +14,7 @@ export default function ParticipantAvatars({
   return (
     <div className="flex -space-x-2">
       {people.map((p) => {
-        const color = branchColor(p.family_branch ?? "");
+        const color = avatarColor(p.id);
         const initial = p.first_name?.trim().charAt(0).toUpperCase() || "?";
         return (
           <span

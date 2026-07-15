@@ -28,3 +28,32 @@ export function branchInitial(branch: string): string {
   const stripped = branch.replace(/^de\s+|^d['’]/i, "");
   return stripped.charAt(0).toUpperCase() || "?";
 }
+
+
+// Avatars are colored per-person, not per-branch — two siblings from the
+// same family branch would otherwise render as visually identical circles
+// (same hue), distinguishable only by their initial. A larger palette
+// hashed from the person's id keeps colors stable across the site while
+// spreading them out more than the 4-branch palette above allows.
+const AVATAR_PALETTE: { light: string; dark: string }[] = [
+  { light: "#f5f0bb", dark: "#6e6c54" }, // cream
+  { light: "#c4dfaa", dark: "#6c7b5e" }, // mint
+  { light: "#90c8ac", dark: "#567867" }, // sage
+  { light: "#73a9ad", dark: "#5b8c90" }, // teal
+  { light: "#f0c9a0", dark: "#8a5a34" }, // terracotta
+  { light: "#cbd8e6", dark: "#4a6178" }, // dusty blue
+  { light: "#e0c8dc", dark: "#7a4f72" }, // plum
+  { light: "#f2dfa0", dark: "#8a6d24" }, // mustard
+];
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+export function avatarColor(personId: string): { light: string; dark: string } {
+  return AVATAR_PALETTE[hashString(personId) % AVATAR_PALETTE.length];
+}

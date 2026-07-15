@@ -30,7 +30,7 @@ export default function WeatherCard({ weather }: { weather: CurrentWeather | nul
   return (
     <Link
       href="/weather"
-      className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
+      className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
     >
       <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
         <ThermoIcon /> Météo du jour
@@ -38,11 +38,18 @@ export default function WeatherCard({ weather }: { weather: CurrentWeather | nul
 
       {weather ? (
         <>
-          <div className="mt-3 flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-slate-900">
-              {weather.tempC}°
-            </span>
-            <span className="text-sm text-slate-500">C</span>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-bold text-slate-900">
+                {weather.tempC}°
+              </span>
+              <span className="text-sm text-slate-500">C</span>
+            </div>
+            {wind && (
+              <span className="text-4xl font-bold text-slate-900">
+                Force {wind.force}
+              </span>
+            )}
           </div>
           <p className="mt-1 text-base font-medium text-slate-700">
             {weather.label} · L&apos;Île d&apos;Yeu
@@ -51,15 +58,11 @@ export default function WeatherCard({ weather }: { weather: CurrentWeather | nul
             {weather.high !== null && weather.low !== null && (
               <p>↑{weather.high}° ↓{weather.low}°</p>
             )}
-            {wind && (
-              <p>
-                Vent : {wind.label} — force {wind.force} Beaufort
-              </p>
-            )}
+            {wind && <p>Vent : {wind.label}</p>}
           </div>
         </>
       ) : (
-        <p className="mt-6 text-sm text-slate-500">Météo indisponible pour le moment.</p>
+        <p className="mt-3 text-sm text-slate-500">Météo indisponible pour le moment.</p>
       )}
     </Link>
   );

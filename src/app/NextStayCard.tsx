@@ -13,12 +13,12 @@ export default function NextStayCard({
     return (
       <Link
         href="/bookings"
-        className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
+        className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
       >
         <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
           <CalendarIcon /> Prochain séjour
         </p>
-        <p className="mt-6 text-sm text-slate-500">
+        <p className="mt-3 text-sm text-slate-500">
           Aucun séjour prévu — réservez vos prochaines vacances.
         </p>
       </Link>
@@ -28,7 +28,7 @@ export default function NextStayCard({
   return (
     <Link
       href="/bookings"
-      className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
+      className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-teal"
     >
       <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
         <CalendarIcon /> Prochain séjour

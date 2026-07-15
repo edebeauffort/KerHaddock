@@ -16,6 +16,7 @@ import WebcamCard from "./WebcamCard";
 import MemoryHero from "./memories/MemoryHero";
 import MemoryCard from "./memories/MemoryCard";
 import NoMemoryCard from "./memories/NoMemoryCard";
+import SeasonalHighlightCard from "./memories/SeasonalHighlightCard";
 
 type Profile = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -53,9 +54,13 @@ export default async function Home() {
   const highlight = stay ? findSeasonalHighlight(memories, stay.startISO) : null;
   const showHighlight = highlight && highlight.id !== heroMemory?.id;
 
-  // Participant profiles for every memory shown on this page, fetched once.
+  // Participant profiles for every memory shown on this page, fetched once
+  // (the highlight can point at a memory outside the first-7 grid slice).
   const memoryParticipantIds = Array.from(
-    new Set(memories.slice(0, 7).flatMap((m) => m.participant_ids)),
+    new Set([
+      ...memories.slice(0, 7).flatMap((m) => m.participant_ids),
+      ...(highlight?.participant_ids ?? []),
+    ]),
   );
   const { data: memoryProfiles } = memoryParticipantIds.length
     ? await supabase
@@ -77,6 +82,15 @@ export default async function Home() {
       <div className="relative h-[88vh] min-h-[480px] w-full">
         <HeroCarousel images={heroImages} />
         <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pb-24 text-center sm:pb-32">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg sm:text-5xl">
+            L&apos;Île d&apos;Yeu
+          </h1>
+          <p className="mt-3 max-w-xl text-lg text-white drop-shadow-lg">
+            Tout ce qu&apos;il faut savoir sur nos vacances, en un seul
+            endroit.
+          </p>
+        </div>
       </div>
 
       <div className="mx-auto w-full max-w-5xl space-y-10 p-6">
@@ -120,17 +134,11 @@ export default async function Home() {
           )}
 
           {showHighlight && highlight && (
-            <Link
-              href={`/memories/${highlight.id}`}
-              className="flex items-center gap-3 rounded-xl border border-brand-sage bg-brand-mint/15 p-4 transition hover:border-brand-teal"
-            >
-              <span className="shrink-0 text-lg">📍</span>
-              <p className="text-sm text-slate-700">
-                <span className="font-semibold">L&apos;an dernier, à la même période</span>{" "}
-                — revivez ce souvenir
-              </p>
-              <span className="ml-auto shrink-0 text-slate-400">›</span>
-            </Link>
+            <SeasonalHighlightCard
+              memory={highlight}
+              photoUrl={memoryPhotoUrl(supabase, highlight.cover_photo_path)}
+              participants={participantsFor(highlight.participant_ids)}
+            />
           )}
 
           {heroMemory ? (
@@ -154,6 +162,7 @@ export default async function Home() {
                   key={m.id}
                   memory={m}
                   photoUrl={memoryPhotoUrl(supabase, m.cover_photo_path)}
+                  participants={participantsFor(m.participant_ids)}
                 />
               ))}
             </div>

@@ -162,7 +162,7 @@ photo into `public/bookings-hero/` (any filename, `.jpg`/`.jpeg`/`.png`/`.webp`)
 — the first one found (alphabetical order) is used automatically. With none
 added, it falls back to a plain brand-colored gradient.
 
-## 3.8 Memories (run migration 0009)
+## 3.8 Memories (run migrations 0009, 0010, and 0011)
 
 The homepage now leads with a "Souvenirs" (Memories) section — one entry
 per stay, with a cover photo, an optional Google Photos album link, and a
@@ -177,11 +177,24 @@ Supabase Storage bucket for cover photos:
    its access policies via SQL, so there's no separate manual bucket-setup
    step in the Supabase dashboard.
 
-Anyone can add a memory (for whichever stay is current or next up); only
-its author or a host can edit or delete it afterwards. Cover photos are
-public-read (same trust model as every other photo on this site — nothing
-is secret beyond "you need the link"), uploads require a logged-in family
-member.
+Anyone can add a memory for any date range they choose — not just a
+booked stay — with a house, participants (family members plus a headcount
+for guests without an account), a cover photo, an album link, and an
+anecdote. Only its author or a host can edit or delete it afterwards. Cover
+photos are public-read (same trust model as every other photo on this site
+— nothing is secret beyond "you need the link"), uploads require a
+logged-in family member.
+
+**If you already ran 0009 on an earlier version of this project**, also run:
+
+- `supabase/migrations/0010_memories_other_guests.sql` — adds the "other
+  guests" headcount column. If saving a memory ever errors with
+  `Could not find the 'other_guests_count' column`, this migration hasn't
+  been run yet (or Supabase's API cache just needs a moment — the migration
+  also tells it to reload immediately).
+- `supabase/migrations/0011_memories_drop_date_exclusion.sql` — removes the
+  one-memory-per-overlapping-date-range restriction, so more than one
+  memory can be added for the same (or overlapping) dates.
 
 ## 3.9 Google Analytics (optional)
 

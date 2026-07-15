@@ -9,6 +9,8 @@ import {
   memoryPhotoUrl,
 } from "@/lib/memories";
 import { formatDateRangeFr } from "@/lib/formatDateRange";
+import DeleteMemoryButton from "../DeleteMemoryButton";
+import ParticipantAvatars from "../ParticipantAvatars";
 
 type Profile = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -24,7 +26,7 @@ export default async function MemoryDetailPage({
     supabase
       .from("memories")
       .select(
-        "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, created_by, created_at",
+        "id, house_id, date_range, google_photos_url, cover_photo_path, anecdote, weather_summary, participant_ids, other_guests_count, created_by, created_at",
       )
       .eq("id", id)
       .single(),
@@ -47,6 +49,7 @@ export default async function MemoryDetailPage({
   const participants = memory.participant_ids
     .map((pid: string) => profileById.get(pid))
     .filter((p: Profile | undefined): p is Profile => !!p);
+  const totalParticipants = participants.length + (memory.other_guests_count ?? 0);
   const bookedByName = memory.created_by
     ? profileById.get(memory.created_by)?.first_name ?? null
     : null;
@@ -76,13 +79,20 @@ export default async function MemoryDetailPage({
         <InfoCard label="Dates" value={formatDateRangeFr(range.start, range.end)} />
         <InfoCard label="Organisé par" value={bookedByName ?? "—"} />
         <InfoCard label="Météo" value={memory.weather_summary ?? "—"} />
-        <InfoCard label="Participants" value={`${participants.length} participant${participants.length > 1 ? "s" : ""}`} />
+        <InfoCard label="Participants" value={`${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`} />
       </div>
 
-      {participants.length > 0 && (
-        <p className="text-sm text-slate-600">
-          {participants.map((p: Profile) => p.first_name).filter(Boolean).join(", ")}
-        </p>
+      {(participants.length > 0 || memory.other_guests_count > 0) && (
+        <div className="flex flex-wrap items-center gap-3">
+          {participants.length > 0 && <ParticipantAvatars people={participants} size="md" />}
+          <p className="text-sm text-slate-600">
+            {participants.map((p: Profile) => p.first_name).filter(Boolean).join(", ")}
+            {memory.other_guests_count > 0 &&
+              (participants.length > 0
+                ? ` et ${memory.other_guests_count} autre${memory.other_guests_count > 1 ? "s" : ""} invité${memory.other_guests_count > 1 ? "s" : ""}`
+                : `${memory.other_guests_count} invité${memory.other_guests_count > 1 ? "s" : ""}`)}
+          </p>
+        </div>
       )}
 
       <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100">
@@ -118,6 +128,7 @@ export default async function MemoryDetailPage({
             ✏️ Modifier le souvenir
           </Link>
         )}
+        {canEdit && <DeleteMemoryButton memoryId={memory.id} />}
       </div>
     </div>
   );

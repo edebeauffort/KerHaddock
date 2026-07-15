@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { parseMemoryRange, seasonLabel, seasonIcon, type MemoryRow } from "@/lib/memories";
 import { formatDateRangeFr } from "@/lib/formatDateRange";
+import ParticipantAvatars from "./ParticipantAvatars";
 
 type Person = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -10,9 +11,11 @@ type Person = { id: string; first_name: string | null; family_branch: string | n
 export default function MemoryCard({
   memory,
   photoUrl,
+  participants = [],
 }: {
   memory: MemoryRow;
   photoUrl: string | null;
+  participants?: Person[];
 }) {
   const range = parseMemoryRange(memory.date_range);
   if (!range) return null;
@@ -49,6 +52,11 @@ export default function MemoryCard({
         </h3>
         {memory.anecdote && (
           <p className="mt-1 line-clamp-2 text-sm text-slate-600">{memory.anecdote}</p>
+        )}
+        {participants.length > 0 && (
+          <div className="mt-2">
+            <ParticipantAvatars people={participants} />
+          </div>
         )}
       </div>
     </Link>
