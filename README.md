@@ -200,7 +200,18 @@ logged-in family member.
   two smaller ones) instead of a single cover photo; backfills existing
   memories' single photo into the new column automatically.
 
-## 3.9 Google Analytics (optional)
+## 3.9 Deleting a user fails (run migration 0013)
+
+If deleting someone from Utilisateurs shows an error mentioning a foreign
+key / constraint, it's because that user created a memory or approved a
+priority-period booking at some point — `memories.created_by` and
+`bookings.approved_by` originally had no `ON DELETE` behavior, so Postgres
+refuses to delete a user those columns still point to rather than leave a
+dangling reference. Run `supabase/migrations/0013_fk_set_null_on_user_delete.sql`
+once — it switches both to `ON DELETE SET NULL`, so deleting the user keeps
+the memory/booking itself and just clears who created/approved it.
+
+## 3.10 Google Analytics (optional)
 
 1. Go to [analytics.google.com](https://analytics.google.com) → Admin →
    create an Account (if you don't have one) → create a Property for this

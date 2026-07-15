@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +10,7 @@ import {
 import { formatDateRangeFr } from "@/lib/formatDateRange";
 import DeleteMemoryButton from "../DeleteMemoryButton";
 import ParticipantAvatars from "../ParticipantAvatars";
+import MemoryPhotoViewer from "../MemoryPhotoViewer";
 
 type Profile = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -95,34 +95,7 @@ export default async function MemoryDetailPage({
         </div>
       )}
 
-      {photoUrls.length >= 3 ? (
-        <div className="grid aspect-video w-full grid-cols-2 grid-rows-2 gap-2">
-          <div className="relative row-span-2 overflow-hidden rounded-2xl bg-slate-100">
-            <Image src={photoUrls[0]} alt="" fill className="object-cover" />
-          </div>
-          {photoUrls.slice(1, 3).map((url, i) => (
-            <div key={i} className="relative overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={url} alt="" fill className="object-cover" />
-            </div>
-          ))}
-        </div>
-      ) : photoUrls.length === 2 ? (
-        <div className="grid aspect-video w-full grid-cols-2 gap-2">
-          {photoUrls.map((url, i) => (
-            <div key={i} className="relative overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={url} alt="" fill className="object-cover" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100">
-          {photoUrls[0] ? (
-            <Image src={photoUrls[0]} alt="" fill className="object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-brand-sage to-brand-mint" />
-          )}
-        </div>
-      )}
+      <MemoryPhotoViewer photoUrls={photoUrls} />
 
       {memory.anecdote && (
         <blockquote className="border-l-4 border-brand-sage pl-4 text-lg italic text-slate-700">

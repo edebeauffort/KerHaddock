@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getAllMemories, memoryPhotoUrl, parseMemoryRange, type MemoryRow } from "@/lib/memories";
+import { getAllMemories, memoryPhotoUrls, parseMemoryRange, type MemoryRow } from "@/lib/memories";
 import { getNextStay } from "@/lib/nextStay";
 import MemoryCard from "./MemoryCard";
 import NoMemoryCard from "./NoMemoryCard";
@@ -85,7 +85,7 @@ export default async function MemoriesArchivePage() {
                   <MemoryCard
                     key={m.id}
                     memory={m}
-                    photoUrl={memoryPhotoUrl(supabase, m.cover_photo_path)}
+                    photoUrls={memoryPhotoUrls(supabase, m)}
                     participants={participantsFor(m.participant_ids)}
                   />
                 ))}

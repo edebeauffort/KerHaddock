@@ -38,31 +38,20 @@ export default function WeatherCard({ weather }: { weather: CurrentWeather | nul
 
       {weather ? (
         <>
-          <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-1">
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-slate-900">
-                {weather.tempC}°
-              </span>
-              <span className="text-sm text-slate-500">C</span>
-            </div>
-            {wind && (
-              <span className="text-4xl font-bold text-slate-900">
-                Force {wind.force}
-              </span>
-            )}
+          <div className="mt-3 flex items-baseline gap-1">
+            <span className="text-4xl font-bold text-slate-900">
+              {weather.tempC}°
+            </span>
+            <span className="text-sm text-slate-500">C</span>
           </div>
           <p className="mt-1 text-base font-medium text-slate-700">
             {weather.label} · L&apos;Île d&apos;Yeu
           </p>
-          <div className="mt-3 space-y-0.5 text-xs text-slate-500">
+          <div className="mt-3 space-y-0.5 text-sm text-slate-500">
             {weather.high !== null && weather.low !== null && (
               <p>↑{weather.high}° ↓{weather.low}°</p>
             )}
-            {wind && (
-              <p>
-                Vent : {wind.label} — force {wind.force} Beaufort
-              </p>
-            )}
+            {wind && <p>Vent : {wind.label}</p>}
           </div>
         </>
       ) : (

@@ -45,7 +45,7 @@ create table if not exists public.bookings (
   -- Set when a booking falls inside another branch's priority period: the
   -- branch(es) that need to approve it before it becomes confirmed.
   pending_branches text[],
-  approved_by uuid references auth.users (id),
+  approved_by uuid references auth.users (id) on delete set null,
   approved_at timestamptz,
 
   -- Booking is per bedroom. "Book the whole house" is done at the app layer
@@ -91,7 +91,7 @@ create table if not exists public.memories (
   weather_summary text,
   participant_ids uuid[] not null default '{}',
   other_guests_count int not null default 0,
-  created_by uuid references auth.users (id),
+  created_by uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now()
 );
 

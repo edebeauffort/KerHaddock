@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { parseMemoryRange, seasonLabel, seasonIcon, type MemoryRow } from "@/lib/memories";
 import { formatDateRangeFr } from "@/lib/formatDateRange";
 import ParticipantAvatars from "./ParticipantAvatars";
+import MemoryMosaic from "./MemoryMosaic";
 
 type Person = { id: string; first_name: string | null; family_branch: string | null };
 
@@ -10,11 +10,11 @@ type Person = { id: string; first_name: string | null; family_branch: string | n
 // title/anecdote/participants sit on a dark gradient at the bottom.
 export default function MemoryHero({
   memory,
-  photoUrl,
+  photoUrls,
   participants,
 }: {
   memory: MemoryRow;
-  photoUrl: string | null;
+  photoUrls: string[];
   participants: Person[];
 }) {
   const range = parseMemoryRange(memory.date_range);
@@ -25,16 +25,7 @@ export default function MemoryHero({
       href={`/memories/${memory.id}`}
       className="group relative block h-80 w-full overflow-hidden rounded-2xl sm:h-96"
     >
-      {photoUrl ? (
-        <Image
-          src={photoUrl}
-          alt=""
-          fill
-          className="object-cover transition group-hover:scale-105"
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-brand-sage to-brand-mint" />
-      )}
+      <MemoryMosaic photoUrls={photoUrls} imageClassName="transition group-hover:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
       <div className="absolute inset-x-0 bottom-0 p-6 text-white">

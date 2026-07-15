@@ -6,6 +6,7 @@ import { getHeroImages } from "@/lib/heroImages";
 import {
   getAllMemories,
   memoryPhotoUrl,
+  memoryPhotoUrls,
   parseMemoryRange,
   findSeasonalHighlight,
 } from "@/lib/memories";
@@ -144,7 +145,7 @@ export default async function Home() {
           {heroMemory ? (
             <MemoryHero
               memory={heroMemory}
-              photoUrl={memoryPhotoUrl(supabase, heroMemory.cover_photo_path)}
+              photoUrls={memoryPhotoUrls(supabase, heroMemory)}
               participants={participantsFor(heroMemory.participant_ids)}
             />
           ) : (
@@ -161,7 +162,7 @@ export default async function Home() {
                 <MemoryCard
                   key={m.id}
                   memory={m}
-                  photoUrl={memoryPhotoUrl(supabase, m.cover_photo_path)}
+                  photoUrls={memoryPhotoUrls(supabase, m)}
                   participants={participantsFor(m.participant_ids)}
                 />
               ))}
