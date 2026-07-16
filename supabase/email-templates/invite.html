@@ -2,37 +2,116 @@
   <tr>
     <td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.08);">
+
+        <!-- Hero band — the house photo, shipped at public/email/invite-hero.jpg
+             so it resolves at {{ .SiteURL }}/email/invite-hero.jpg on the live
+             site (unlike public/hero/, this filename is fixed and always
+             present). The background="" attribute is the classic email-client
+             fallback for clients that ignore CSS background-image; bgcolor is
+             the last-resort fallback for clients that show neither. A
+             translucent dark overlay sits on top so the white text stays
+             legible over a bright photo. -->
         <tr>
-          <td style="padding:40px 40px 24px 40px; text-align:center;">
-            <span style="display:inline-block; margin:0 0 20px 0; padding:6px 14px; border-radius:999px; background-color:#f5f0bb; font-size:12px; font-weight:700; letter-spacing:2px; color:#4c7478; text-transform:uppercase;">L'Île d'Yeu</span>
-            <p style="margin:16px 0 16px 0; font-size:24px; line-height:32px; font-weight:700; color:#222222;">Vous êtes invité(e) !</p>
-            <p style="margin:0; font-size:16px; line-height:24px; color:#484848;">
-              Vous avez été invité(e) à rejoindre le site de la famille pour la
-              maison de l'Île d'Yeu &mdash; calendrier des séjours, météo,
-              webcam et bien plus, tout au même endroit.
+          <td bgcolor="#3f6266" background="{{ .SiteURL }}/email/invite-hero.jpg" style="background-color:#3f6266; background-image:url('{{ .SiteURL }}/email/invite-hero.jpg'); background-size:cover; background-position:center; padding:0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background-color:rgba(31,45,45,0.5); padding:40px 32px 32px 32px; text-align:center;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 16px auto;">
+                    <tr>
+                      <td width="56" height="56" align="center" valign="middle" style="width:56px; height:56px; border-radius:28px; background-color:rgba(255,255,255,0.25); font-size:26px; line-height:56px;">
+                        🏡
+                      </td>
+                    </tr>
+                  </table>
+                  <p style="margin:0 0 6px 0; font-size:24px; line-height:30px; font-weight:700; color:#ffffff;">Bienvenue à l&rsquo;Île d&rsquo;Yeu</p>
+                  <p style="margin:0; font-size:14px; line-height:20px; color:rgba(255,255,255,0.9);">Réservations, souvenirs &amp; météo, au même endroit</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Greeting -->
+        <tr>
+          <td style="padding:32px 40px 8px 40px;">
+            <p style="margin:0 0 10px 0; font-size:16px; line-height:24px; color:#222222;">Bonjour {{ .Data.first_name }},</p>
+            <p style="margin:0; font-size:15px; line-height:22px; color:#484848;">
+              Je t&rsquo;invite à rejoindre l&rsquo;espace privé de la famille pour la maison de l&rsquo;Île d&rsquo;Yeu 🏡
             </p>
           </td>
         </tr>
+
+        <!-- Features -->
         <tr>
-          <td style="padding:0 40px 40px 40px; text-align:center;">
+          <td style="padding:28px 40px 8px 40px;">
+            <p style="margin:0 0 16px 0; font-size:12px; font-weight:700; letter-spacing:1.5px; color:#4c7478; text-transform:uppercase;">Ce qui vous attend</p>
+
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
+              <tr>
+                <td width="48" valign="top" style="padding-right:14px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                    <td width="44" height="44" align="center" valign="middle" style="width:44px; height:44px; border-radius:12px; background-color:#c4dfaa; font-size:20px; line-height:44px;">📅</td>
+                  </tr></table>
+                </td>
+                <td valign="middle">
+                  <p style="margin:0 0 2px 0; font-size:15px; font-weight:700; color:#222222;">Réserver un séjour</p>
+                  <p style="margin:0; font-size:13px; line-height:19px; color:#666666;">Choisissez vos dates en un clic.</p>
+                </td>
+              </tr>
+            </table>
+
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;">
+              <tr>
+                <td width="48" valign="top" style="padding-right:14px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                    <td width="44" height="44" align="center" valign="middle" style="width:44px; height:44px; border-radius:12px; background-color:#f5f0bb; font-size:20px; line-height:44px;">📷</td>
+                  </tr></table>
+                </td>
+                <td valign="middle">
+                  <p style="margin:0 0 2px 0; font-size:15px; font-weight:700; color:#222222;">Partager des souvenirs</p>
+                  <p style="margin:0; font-size:13px; line-height:19px; color:#666666;">Photos et anecdotes de vos séjours.</p>
+                </td>
+              </tr>
+            </table>
+
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+              <tr>
+                <td width="48" valign="top" style="padding-right:14px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                    <td width="44" height="44" align="center" valign="middle" style="width:44px; height:44px; border-radius:12px; background-color:#90c8ac; font-size:20px; line-height:44px;">☀️</td>
+                  </tr></table>
+                </td>
+                <td valign="middle">
+                  <p style="margin:0 0 2px 0; font-size:15px; font-weight:700; color:#222222;">Webcam &amp; météo</p>
+                  <p style="margin:0; font-size:13px; line-height:19px; color:#666666;">La maison en direct, où que vous soyez.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:24px 40px 32px 40px; text-align:center;">
             <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite&amp;next=/auth/update-password"
                style="display:inline-block; background-color:#73a9ad; color:#ffffff; font-size:16px; font-weight:600; text-decoration:none; padding:14px 36px; border-radius:999px;">
-              Accepter l'invitation
+              Accepter l&rsquo;invitation →
             </a>
           </td>
         </tr>
+
+        <!-- Footer -->
         <tr>
-          <td style="padding:24px 40px 32px 40px; border-top:1px solid #eeeeee;">
-            <p style="margin:0; font-size:13px; line-height:20px; color:#999999; text-align:center;">
-              Ce lien vous permettra de choisir votre mot de passe et
-              d'accéder au site. Si vous ne vous attendiez pas à cette
-              invitation, vous pouvez ignorer cet e-mail sans risque.
+          <td style="padding:20px 40px 32px 40px; border-top:1px solid #eeeeee;">
+            <p style="margin:0; font-size:12px; line-height:18px; color:#999999; text-align:center;">
+              Envoyé avec amour par la famille 🏡<br>
+              Pas concerné(e) ? Ignorez simplement cet e-mail.
             </p>
           </td>
         </tr>
       </table>
       <p style="margin:24px 0 0 0; font-size:12px; color:#3f6266; text-align:center;">
-        La Maison de l'Île d'Yeu
+        La Maison de l&rsquo;Île d&rsquo;Yeu
       </p>
     </td>
   </tr>

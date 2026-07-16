@@ -8,9 +8,11 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-// Same card layout as the Supabase invite/reset-password templates
-// (supabase/email-templates/*.html) — kept in sync by hand since these two
-// are triggered from application code rather than Supabase's own mailer.
+// Same simple card layout as the Supabase reset-password template
+// (supabase/email-templates/reset-password.html) — kept in sync by hand
+// since these are triggered from application code rather than Supabase's
+// own mailer. The invite template has since grown its own richer layout
+// (hero band + feature list), so it's no longer a match for this one.
 function renderEmailCard(params: {
   heading: string;
   bodyHtml: string;

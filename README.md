@@ -99,14 +99,30 @@ Redirect URLs allow list, and is a common source of the link "working" but
 landing back on the plain login screen instead of a password form.
 
 This project avoids that by verifying the link itself, server-side, at
-`/auth/confirm`. Two ready-made, Airbnb-style HTML templates that link
-there correctly are included at `supabase/email-templates/invite.html` and
+`/auth/confirm`. Two ready-made HTML templates that link there correctly
+are included at `supabase/email-templates/invite.html` and
 `supabase/email-templates/reset-password.html` — open each, copy the whole
 file, and paste it into the matching template's HTML box in the Supabase
 dashboard under **Authentication → Email Templates** (it replaces
 everything in that box, subject line is a separate field above it —
 suggested subjects: "Vous êtes invité·e à rejoindre L'Île d'Yeu" and
 "Réinitialisez votre mot de passe – L'Île d'Yeu").
+
+The invite template greets people by first name using
+`{{ .Data.first_name }}`, which only gets filled in when the invite is
+sent the normal way — from Utilisateurs → Ajouter un utilisateur. Inviting
+someone directly from the Supabase dashboard instead skips that metadata,
+so the greeting would render blank.
+
+The invite template's header photo (`public/email/invite-hero.jpg`) is
+part of the app itself, not something you upload to Supabase — it just
+needs to be deployed with the rest of the site, which happens automatically
+since it lives under `public/`. The template loads it at
+`{{ .SiteURL }}/email/invite-hero.jpg`, so it'll only show up correctly
+once your Supabase project's **Site URL** (Authentication → URL
+Configuration) is set to your real deployed domain rather than
+`localhost`. Want a different photo? Just replace that file, same
+filename, same folder.
 
 If you'd rather adapt your own template instead, the one required part is
 the link/button `href`:
